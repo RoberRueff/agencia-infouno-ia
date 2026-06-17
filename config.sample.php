@@ -21,4 +21,10 @@ return [
   // --- Notificación por email de cada lead nuevo ---
   'notify_email' => 'ventas@infouno.com.ar',     // a dónde llegan los avisos
   'from_email'   => 'no-reply@infouno.com.ar',   // remitente (mejor un buzón de tu dominio)
+
+  // --- Agente conversacional (OpenAI) ---
+  // Pegá tu API key (sk-...) SOLO acá, en el server. Si queda vacía, el bot usa el guion scripteado.
+  'openai_key'   => '',
+  'openai_model' => 'gpt-4o-mini',   // cambiable a 'gpt-4o' si querés
+  'chat_enabled' => true,            // false = forzar el guion scripteado
 ];
