@@ -1,0 +1,10 @@
+# Credenciales reales (se completan en el server, nunca se versionan)
+config.php
+
+# Material no publicado / pesado
+sin-publicar/
+*.zip
+
+# Sistema
+.DS_Store
+.thumbnail
