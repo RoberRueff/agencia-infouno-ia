@@ -2,7 +2,7 @@
 
 Los *Guardrails* protegen a la inteligencia artificial de manipulación maliciosa (**Prompt Injections**), aseguran el cumplimiento legal de datos en Argentina y garantizan que mantenga su foco de venta comercial.
 
-> **Estado de implementación** (ver `ai/analysis.md`): el bot actual es **scripteado, sin LLM**, por lo que G1 (scope/tono) no aplica todavía. G2 ✅ cumplido por diseño (el bot no menciona precios). G3 ✅ reforzado: `escapeHtml()` en el frontend mitiga XSS en el chat y `lead.php` usa *prepared statements* (mysqli) + sanitización del input antes de tocar MySQL, bloqueando SQL Injection. G4 ✅ implementado: página `privacidad.html` (Ley 25.326), nota de consentimiento en el bot (paso de captura) y bajo el formulario, y link "Privacidad" en el footer de todas las páginas. Estos guardrails serán obligatorios al incorporar la capa cognitiva (OpenAI).
+> **Estado de implementación** (ver `ai/analysis.md`): G1 ✅ activo: el system prompt de `chat.php` prohíbe temas ajenos y responde con el fallback textual reconduciendo a Infouno (aplica en modo IA; en modo guion no hay generación libre). G2 ✅ cumplido por diseño (el bot no menciona precios). G3 ✅ reforzado: `escapeHtml()` en el frontend mitiga XSS en el chat y `lead.php` usa *prepared statements* (mysqli) + sanitización del input antes de tocar MySQL, bloqueando SQL Injection. G4 ✅ implementado: página `privacidad.html` (Ley 25.326), nota de consentimiento en el bot (paso de captura) y bajo el formulario, y link "Privacidad" en el footer de todas las páginas. Estos guardrails son obligatorios con la capa cognitiva (OpenAI) activa.
 
 ---
 
