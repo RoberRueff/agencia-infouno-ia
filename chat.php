@@ -34,7 +34,7 @@ foreach ($msgsIn as $m) {
   $role = (($m['role'] ?? '') === 'assistant') ? 'assistant' : 'user';
   $content = trim((string) ($m['content'] ?? ''));
   if ($content === '') continue;
-  if (mb_strlen($content) > 1500) $content = mb_substr($content, 0, 1500);
+  if (mb_strlen($content) > 1500) $content = mb_substr($content, 0, 1500, 'UTF-8');
   $history[] = ['role' => $role, 'content' => $content];
   if ($role === 'user') $turns++;
 }
@@ -137,7 +137,7 @@ for ($i = 0; $i < 3; $i++) {
 }
 
 // Si agotó el bucle de tools sin texto final
-echo json_encode(['ok' => true, 'reply' => '¿Coordinamos una llamada de 15 min para verlo en detalle?', 'readyToClose' => $readyToClose, 'leadFields' => $savedFields ? $savedFields : new stdClass()]);
+echo json_encode(['ok' => true, 'reply' => '¿Coordinamos una llamada de 15 min para verlo en detalle?', 'readyToClose' => $readyToClose, 'leadFields' => new stdClass()]);
 
 /** Llama a OpenAI Chat Completions. Devuelve el array decodificado o null. */
 function infouno_openai($cfg, $messages, $tools) {
