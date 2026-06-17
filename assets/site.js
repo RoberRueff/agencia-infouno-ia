@@ -291,11 +291,13 @@ function initBot() {
   function aiSend(text) {
     aiBusy = true; aiTurns++;
     aiHistory.push({ role: 'user', content: text });
+    let utm = {};
+    try { utm = JSON.parse(sessionStorage.getItem('leadUTM') || '{}'); } catch (e) { }
     const t = thinking();
     fetch('/chat.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: leadSession(), page: location.pathname, messages: aiHistory })
+      body: JSON.stringify(Object.assign({ session_id: leadSession(), page: location.pathname, messages: aiHistory }, utm))
     })
       .then(r => r.json())
       .then(d => {
@@ -318,13 +320,14 @@ function initBot() {
   function startBot() {
     step = 1;
     const t = thinking();
-    const fallback = () => { t.remove(); step = 0; flow(); };
+    let settled = false;
     const ctrl = ('AbortController' in window) ? new AbortController() : null;
-    const timer = setTimeout(() => { if (ctrl) ctrl.abort(); }, 3500);
+    const finishOnce = (fn) => { if (settled) return; settled = true; clearTimeout(timer); t.remove(); step = 0; fn(); };
+    const timer = setTimeout(() => { if (ctrl) ctrl.abort(); finishOnce(flow); }, 3500);
     fetch('/chat.php', ctrl ? { signal: ctrl.signal } : undefined)
       .then(r => r.json())
-      .then(d => { clearTimeout(timer); t.remove(); if (d && d.enabled) { step = 0; aiStart(); } else { step = 0; flow(); } })
-      .catch(() => { clearTimeout(timer); fallback(); });
+      .then(d => finishOnce((d && d.enabled) ? aiStart : flow))
+      .catch(() => finishOnce(flow));
   }
 
   function flow() {

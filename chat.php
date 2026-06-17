@@ -124,7 +124,12 @@ for ($i = 0; $i < 3; $i++) {
 
     if ($fn === 'guardar_lead') {
       require_once __DIR__ . '/db_lead.php';
-      $payload = array_merge($args, ['session_id' => $session, 'source' => 'bot-ia', 'page' => $page]);
+      $utm = [
+        'utm_source'   => isset($in['utm_source'])   ? (string) $in['utm_source']   : '',
+        'utm_medium'   => isset($in['utm_medium'])   ? (string) $in['utm_medium']   : '',
+        'utm_campaign' => isset($in['utm_campaign']) ? (string) $in['utm_campaign'] : '',
+      ];
+      $payload = array_merge($args, $utm, ['session_id' => $session, 'source' => 'bot-ia', 'page' => $page]);
       $r = infouno_save_lead($cfg, $payload);
       $savedFields = array_merge($savedFields, $args);
       $result = ['ok' => (bool) ($r['ok'] ?? false)];
