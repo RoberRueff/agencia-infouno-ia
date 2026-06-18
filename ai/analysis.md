@@ -15,7 +15,7 @@ Los documentos `architecture.md`, `taxonomy.md`, `rules.md`, `guardrails.md` y `
 ## 2. Estructura Real del Repositorio
 
 ```text
-infouno-agencia-ia/                 (raíz = solo lo que se publica/opera)
+agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 ├── index.html              Home: hero, dolores, calculadora, servicios, bot "Uno", confianza, CTA
 ├── soluciones-ia.html      Página de soluciones de IA
 ├── servicios.html          Servicios
