@@ -11,6 +11,10 @@ window.INFOUNO = {
   // Ejemplos:  "https://cal.com/infouno/15min"  ·  "https://calendly.com/infouno/15min"
   // Si lo dejás vacío, el bot y los botones siguen coordinando por WhatsApp.
   agenda: "https://cal.com/infouno/consultoria-15-min",
+  // ID de medición de Google Analytics 4 (formato "G-XXXXXXXXXX").
+  // Vacío = no se carga GA4 (el banner de cookies queda inerte). Pegá el ID real cuando
+  // crees la propiedad GA4. Sin consentimiento del usuario NO se carga ni se setean cookies.
+  ga4: "G-54V1PR8K7V",
 };
 
 function waLink(msg) {
@@ -412,6 +416,93 @@ function initBot() {
   }
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 }
+
+/* ===========================================================
+   Consentimiento de cookies + Google Consent Mode v2 + GA4
+   Opt-in (Ley 25.326 / G4): NO se carga GA4 ni se setean cookies
+   de analytics hasta que el usuario acepta. Sin ID en INFOUNO.ga4
+   el banner no aparece (no hay nada que consentir).
+   =========================================================== */
+(function () {
+  var KEY = 'infouno_consent';                 // 'granted' | 'denied'
+  var GA_ID = (window.INFOUNO && window.INFOUNO.ga4) || '';
+
+  // dataLayer + gtag disponibles siempre (sin red): habilita Consent Mode v2.
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  window.gtag = gtag;
+
+  // Consent Mode v2: por defecto TODO denegado hasta una decisión explícita.
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    wait_for_update: 500
+  });
+
+  function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function remember(v) { try { localStorage.setItem(KEY, v); } catch (e) { } }
+
+  // Carga la librería de GA4 (solo tras consentimiento). Idempotente.
+  var loaded = false;
+  function loadGA() {
+    if (loaded || !GA_ID) return; loaded = true;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', GA_ID, { anonymize_ip: true });
+  }
+
+  function grant() {
+    gtag('consent', 'update', {
+      ad_storage: 'granted', ad_user_data: 'granted',
+      ad_personalization: 'granted', analytics_storage: 'granted'
+    });
+    loadGA();
+  }
+
+  function decide(v) { remember(v); if (v === 'granted') grant(); hideBanner(); }
+
+  // Helper de eventos de conversión (lo usa la Tarea 4). Solo dispara con
+  // consentimiento aceptado y GA4 configurado; si no, no-op silencioso.
+  window.infoTrack = function (name, params) {
+    try { if (stored() === 'granted' && GA_ID) gtag('event', name, params || {}); } catch (e) { }
+  };
+
+  var banner;
+  function hideBanner() { if (banner) banner.classList.remove('show'); }
+  function showBanner() {
+    if (banner) { banner.classList.add('show'); return; }
+    banner = document.createElement('div');
+    banner.className = 'consent'; banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-label', 'Aviso de cookies');
+    banner.innerHTML =
+      '<p class="consent__txt">Usamos cookies de medición (Google Analytics) para entender cómo se usa el sitio y mejorarlo. Son opcionales. Más info en nuestra <a href="privacidad.html">política de privacidad</a> (Ley 25.326).</p>'
+      + '<div class="consent__row">'
+      + '<button type="button" class="btn btn--ghost consent__btn" data-consent="denied">Rechazar</button>'
+      + '<button type="button" class="btn btn--primary consent__btn" data-consent="granted">Aceptar</button>'
+      + '</div>';
+    banner.querySelectorAll('[data-consent]').forEach(function (b) {
+      b.addEventListener('click', function () { decide(b.getAttribute('data-consent')); });
+    });
+    (document.body || document.documentElement).appendChild(banner);
+    requestAnimationFrame(function () { banner.classList.add('show'); });
+  }
+
+  function init() {
+    if (!GA_ID) return;                 // sin GA4 configurado no hay nada que consentir
+    var prev = stored();
+    if (prev === 'granted') { grant(); return; }  // ya aceptó: cargar GA4, sin banner
+    if (prev === 'denied') return;                // ya rechazó: respetar y no insistir
+    showBanner();                                 // sin decisión previa: pedir consentimiento
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
 
 /* ===========================================================
    Tweaks — tema, color de acento y tipografía (todas las páginas)

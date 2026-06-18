@@ -330,7 +330,17 @@ p{margin:0}
 [data-theme="light"] .float-card{background:rgba(255,255,255,.95)}
 [data-theme="light"] .field input,[data-theme="light"] .field textarea,[data-theme="light"] .field select{background:#fff}
 [data-theme="light"] .tw-panel{background:#fff}
+[data-theme="light"] .consent{background:#fff}
 [data-theme="light"] .footer{background:#0C1622;--muted:#8595a6;--text:#aeb9c6;--ink:#fff;--line:rgba(255,255,255,.1)}
+
+/* Consentimiento de cookies (opt-in, Ley 25.326). Abajo a la izquierda
+   para no tapar el botón de WhatsApp ni el FAB del bot (abajo a la derecha). */
+.consent{position:fixed;left:16px;bottom:16px;z-index:1100;width:380px;max-width:calc(100vw - 32px);background:var(--panel-2);border:1px solid var(--line-2);border-radius:16px;box-shadow:var(--shadow);font-family:var(--ff-body);padding:18px;transform:translateY(150%);opacity:0;transition:transform .3s ease,opacity .3s ease}
+.consent.show{transform:translateY(0);opacity:1}
+.consent__txt{margin:0 0 14px;font-size:.85rem;line-height:1.55;color:var(--text)}
+.consent__txt a{color:var(--acc);text-decoration:underline}
+.consent__row{display:flex;gap:10px}
+.consent__btn{flex:1;padding:11px 14px;font-size:.92rem}
 
 /* ===========================================================
    Componentes del blueprint
