@@ -4,9 +4,11 @@ Plan del entregable de **reporting** que Infouno ofrece a sus clientes: una vist
 cliente con embudo, ranking de keywords y origen de leads. Infouno funciona como **piloto
 y plantilla**; luego se clona por cliente.
 
-> Estado: **planificado** (sin implementar). Fuente de verdad técnica del proyecto: `ai/`
-> (ver `ai/analysis.md`). Este doc vive en `seo/` por ser un entregable de medición/SEO.
-> _Creado: 2026-06-17._
+> Estado: **en implementación** — Tareas 2-4 hechas y verificadas en navegador (banner de
+> consentimiento + Consent Mode v2 + GA4 `G-54V1PR8K7V` + los 5 eventos de conversión).
+> Pendientes: Tarea 1 (verificar GSC) y Tarea 6 (plantilla Looker). Fuente de verdad técnica
+> del proyecto: `ai/` (ver `ai/analysis.md`). Este doc vive en `seo/` por ser un entregable
+> de medición/SEO. _Creado: 2026-06-17 · Actualizado: 2026-06-18._
 
 ---
 
@@ -44,16 +46,21 @@ de `wp_infouno_leads` con el tráfico (Looker no ve la tabla MySQL).
 
 ## 3. Secuencia de ejecución (Infouno piloto)
 
-| # | Tarea | Toca | Bloquea a |
+| # | Tarea | Toca | Estado |
 |---|---|---|---|
-| 1 | Crear GA4 (`G-XXXX`) + verificar propiedad en GSC | Cuentas Google | — |
-| 2 | Banner de consentimiento + Consent Mode v2 (default `denied`) | nuevo en `assets/site.js` + `<head>` | 3 |
-| 3 | Inyectar `gtag.js` async, **tras** consentimiento, en las 8 páginas | `<head>` de los `*.html` | 4 |
-| 4 | Disparar los 5 eventos de conversión en los handlers existentes | `assets/site.js` + `tel:` en HTML | 5 |
-| 5 | Verificar en GA4 DebugView + medir LCP antes/después | navegador | 6 |
-| 6 | Construir plantilla Looker (3 módulos) | Looker | — |
+| 1 | Crear GA4 (`G-54V1PR8K7V`) + verificar propiedad en GSC | Cuentas Google | ⏳ GA4 creada; falta verificar GSC |
+| 2 | Banner de consentimiento + Consent Mode v2 (default `denied`) | `assets/site.js` + `styles.css` | ✅ hecho y verificado |
+| 3 | Cargar `gtag.js` async **tras** consentimiento | (absorbido en Tarea 2: `site.js` corre en las 8 páginas) | ✅ hecho |
+| 4 | Disparar los 5 eventos de conversión en los handlers existentes | `assets/site.js` | ✅ 4/5 verificados; `click_phone` listo pero sin `tel:` aún |
+| 5 | Verificar en navegador + DebugView | navegador | ✅ verificado en Chrome headless; ⏳ falta DebugView en la cuenta GA4 |
+| 6 | Construir plantilla Looker (3 módulos) | Looker | ⏳ pendiente |
 
-**Orden crítico:** 2 → 3 → 4. El consentimiento va primero; nada de `gtag` antes del banner.
+**Orden crítico cumplido:** 2 → 3 → 4. El consentimiento va primero; nada de `gtag` antes
+del banner. La Tarea 3 quedó absorbida por la 2 (el módulo de `site.js` está en las 8 páginas).
+
+> **Nota `click_phone`:** instrumentado vía listener delegado, pero hoy el sitio no tiene
+> links `tel:` (el teléfono solo vive en el JSON-LD). El evento se activará solo cuando se
+> agregue un teléfono clickeable.
 
 ---
 

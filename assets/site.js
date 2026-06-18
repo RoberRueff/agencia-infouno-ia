@@ -69,6 +69,7 @@ function agendaUrl(prefill) {
 function openAgenda(prefill) {
   // Sin agenda configurada → caemos a WhatsApp (nunca dejamos un botón muerto)
   if (!agendaConfigured()) { window.open(waLink(), '_blank', 'noopener'); return; }
+  window.infoTrack('open_agenda', {});
   var ov = document.createElement('div'); ov.className = 'agenda-modal';
   ov.innerHTML = '<div class="agenda-box">'
     + '<button class="agenda-x" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
@@ -85,6 +86,16 @@ function openAgenda(prefill) {
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
   captureUTM();
+
+  // Eventos de conversión → GA4 (vía infoTrack; no-op si no hay consentimiento).
+  // Listener delegado en captura: cubre links estáticos y los que el bot crea al vuelo.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (/wa\.me|api\.whatsapp/.test(href)) window.infoTrack('click_whatsapp', { link_url: href });
+    else if (href.indexOf('tel:') === 0) window.infoTrack('click_phone', { link_url: href });
+  }, true);
 
   // Cualquier elemento con [data-open-agenda] abre el agendador
   document.querySelectorAll('[data-open-agenda]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openAgenda(); }));
@@ -116,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const d = new FormData(form);
       postLead({ source: 'form', name: d.get('nombre') || '', empresa: d.get('empresa') || '', interes: d.get('interes') || '', mensaje: d.get('mensaje') || '' });
+      window.infoTrack('generate_lead', { method: 'form', interes: d.get('interes') || '' });
       const msg = `Hola Infouno 👋\n\nNombre: ${d.get('nombre') || ''}\nEmpresa: ${d.get('empresa') || ''}\nInterés: ${d.get('interes') || ''}\n\n${d.get('mensaje') || ''}`;
       window.open(waLink(msg), '_blank', 'noopener');
       const ok = document.querySelector('#form-ok');
@@ -186,6 +198,9 @@ function initBot() {
   let step = 0, opened = false, autoTimer;
   // Guarda el estado actual del lead en cada paso (no se pierde si abandona)
   function persist() { postLead({ source: 'bot', name: lead.nombre, rubro: lead.rubro, web: lead.web, equipo: lead.equipo, whatsapp: lead.whatsapp, email: lead.email }); }
+  // Evento de conversión: el bot llegó al cierre con un lead. Una sola vez por sesión.
+  let leadTracked = false;
+  function trackLead() { if (leadTracked) return; leadTracked = true; window.infoTrack('bot_lead_captured', { rubro: lead.rubro || '', equipo: lead.equipo || '', web: lead.web || '' }); }
 
   function open() {
     bot.classList.add('open'); fab.classList.add('hide'); opened = true;
@@ -246,7 +261,7 @@ function initBot() {
   }
   // Botones de cierre (agenda + WhatsApp). Compartido por guion e IA.
   function renderCierre() {
-    clearFoot();
+    clearFoot(); trackLead();
     const wrap = document.createElement('div'); wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.gap = '8px';
     const summary = `Hola Infouno 👋 Soy ${lead.nombre || ''}.\nRubro: ${lead.rubro || ''}\nWeb: ${lead.web || ''}\nEquipo: ${lead.equipo || ''}\nMi WhatsApp: ${lead.whatsapp || ''}${lead.email ? '\nEmail: ' + lead.email : ''}\nQuiero agendar la consultoría gratuita de 15 min.`;
     if (agendaConfigured()) {
@@ -391,7 +406,7 @@ function initBot() {
     });
   }
   function finish() {
-    clearFoot();
+    clearFoot(); trackLead();
     const closing = agendaConfigured()
       ? `¡Listo, <b>${escapeHtml(lead.nombre || '')}</b>! 🙌 Elegí el día y horario que mejor te quede y queda agendado al instante. Si preferís, también podés coordinar por WhatsApp.`
       : `¡Listo, <b>${escapeHtml(lead.nombre || '')}</b>! 🙌 Ya tengo todo. Te paso a coordinar el día y horario directamente por WhatsApp.`;

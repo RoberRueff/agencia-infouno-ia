@@ -25,6 +25,13 @@ Registro de lo implementado y lo pendiente. Espejo operativo de la Fase 1.5/1.6 
 - Sumada al **`sitemap.xml`** (8 URLs) y enlazada desde el **footer** de las 7 páginas (columna Servicios).
 - Cross-link interno con `soluciones-ia.html`.
 
+## ✅ Medición — GA4 + consentimiento + eventos (2026-06-18)
+
+- **Banner de consentimiento + Google Consent Mode v2** en `assets/site.js` (+ estilos en `styles.css`). GA4 (`G-54V1PR8K7V`) **opt-in**: no carga `gtag.js` ni setea cookies hasta aceptar (Ley 25.326 / G4). Decisión recordada en `localStorage`.
+- **5 eventos de conversión** vía `window.infoTrack()`: `generate_lead` (form), `click_whatsapp` (delegado), `click_phone` (delegado; sin `tel:` aún), `open_agenda`, `bot_lead_captured` (cierre del bot, una vez por sesión).
+- Verificado en Chrome headless: banner aparece/recuerda decisión, Aceptar carga GA4, Rechazar no, y 4/5 eventos disparan (falta `tel:` para el quinto).
+- Base para el dashboard Looker: ver [dashboard-reporting.md](dashboard-reporting.md).
+
 ---
 
 ## ⏳ Pendiente
