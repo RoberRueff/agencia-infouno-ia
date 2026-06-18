@@ -30,6 +30,11 @@ de `wp_infouno_leads` con el tráfico (Looker no ve la tabla MySQL).
 - **Piloto:** Infouno primero → después se clona a clientes.
 - **Consentimiento:** banner de cookies + **Google Consent Mode v2** (cumple Ley 25.326 / G4).
 - **Dashboard:** Looker Studio estándar, 3 módulos. Sin panel a medida.
+- **Sin Google Tag Manager por ahora (2026-06-18).** La integración por código (gtag vía
+  `site.js`, gateada por consentimiento) alcanza para el piloto y el MVP del dashboard, y es
+  más liviana (LCP). GTM se evaluará al productizar para clientes con tags de marketing/ads
+  (Google Ads, Meta Pixel) o muchos sitios que onboardear. Los eventos ya pushean a
+  `dataLayer`, así que migrar a GTM no exigiría rehacer los puntos de disparo.
 
 ---
 
@@ -58,9 +63,11 @@ de `wp_infouno_leads` con el tráfico (Looker no ve la tabla MySQL).
 **Orden crítico cumplido:** 2 → 3 → 4. El consentimiento va primero; nada de `gtag` antes
 del banner. La Tarea 3 quedó absorbida por la 2 (el módulo de `site.js` está en las 8 páginas).
 
-> **Nota `click_phone`:** instrumentado vía listener delegado, pero hoy el sitio no tiene
-> links `tel:` (el teléfono solo vive en el JSON-LD). El evento se activará solo cuando se
-> agregue un teléfono clickeable.
+> **Nota `click_phone`:** instrumentado vía listener delegado, pero **dormido a propósito en
+> Infouno**. El sitio es WhatsApp-first (no expone teléfono clickeable; el número solo vive en
+> el JSON-LD). No es un pendiente: es una **capacidad lista para sitios de clientes** que sí
+> usan llamada como canal (médicos, contadores, etc.). Se activa solo con que exista un link
+> `tel:` en la página.
 
 ---
 
@@ -91,7 +98,7 @@ Mapean directo al módulo "Origen de leads" del dashboard.
    (form / WhatsApp / teléfono / agenda).
 
 Se construye **una vez** como template y se clona por cliente cambiando las fuentes de
-datos. Filtro de rango de fechas arriba.
+datos. Filtro de rango de fechas arriba. **Paso a paso en [looker-guide.md](looker-guide.md).**
 
 ---
 
