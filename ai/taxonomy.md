@@ -43,7 +43,7 @@ infouno.com.ar/
 
 ## B. Esquema de Datos de los Leads (Campos MySQL)
 
-> **Estado actual:** no hay persistencia. El bot y el formulario arman un mensaje de WhatsApp con el lead, pero **no se guarda en MySQL**. El esquema de abajo es el **objetivo** (ver Fase 1 del roadmap en `ai/analysis.md`). Hoy se capturan: `nombre`, `rubro`, estado web y tamaño de equipo (como texto libre) + `whatsapp`.
+> **Estado actual:** ✅ la persistencia ya está implementada. `lead.php`/`db_lead.php` guardan cada lead en MySQL (`wp_infouno_leads`, ver `db/schema.sql`) con upsert por `session_id`, mapeo a esta taxonomía (`lead_infrastructure`, `lead_size`), `lead_scoring` y `lead_vip`. El esquema de abajo refleja lo que hoy se persiste. Lo único pendiente vs el objetivo es la migración a WordPress y la clasificación de rubro por IA "automatizada" (hoy el rubro entra tal como lo capta el bot).
 
 Cada contacto capturado por el bot interactivo o las calculadoras se normaliza bajo la siguiente estructura taxonómica relacional (tabla `wp_infouno_leads`):
 

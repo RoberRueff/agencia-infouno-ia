@@ -7,7 +7,8 @@
 ## 0. Preámbulo
 
 - **Proyecto:** Infouno — Agencia IA (sitio web + chatbot conversacional con IA).
-- **Stack:** WordPress (Core v6+) + Elementor · OpenAI API (GPT-4o, T=0.3) · MySQL (`wp_infouno_leads`) · Make/Node.js (orquestación).
+- **Stack actual:** HTML estático (7 páginas) + `assets/site.js` · PHP sobre DonWeb/cPanel (`chat.php`, `lead.php`, `db_lead.php`) · OpenAI API (`gpt-4o-mini`, T=0.3) con fallback al guion · MySQL (`wp_infouno_leads`).
+- **Stack objetivo (pendiente):** WordPress (Core v6+) + Elementor · orquestación Make/Node.js.
 - **Idioma de trabajo:** Español.
 - **Referencia de arquitectura:** ver `ai/architecture.md`.
 

@@ -14,7 +14,7 @@
 
 > **IMPORTANTE — leer primero `ai/analysis.md`.** Hay una brecha grande entre la arquitectura objetivo y el estado real.
 
-**Estado actual (lo que hay en el repo):** sitio **HTML estático** (6 páginas) + `assets/styles.css` + `assets/site.js`. La lógica (calculadora ROI, bot "Uno" scripteado, formulario) vive toda en `site.js` y **termina en un link de WhatsApp** (`wa.me`). **No hay** WordPress, MySQL, OpenAI ni backend.
+**Estado actual (lo que hay en el repo):** sitio **HTML estático** (7 páginas) + `assets/styles.css` + `assets/site.js`, **más una capa backend en PHP** sobre DonWeb/cPanel. El frontend (calculadora ROI, bot "Uno", formulario, agenda) vive en `site.js`. El bot "Uno" corre en **dos modos**: IA real vía `chat.php` (OpenAI `gpt-4o-mini`, T=0.3, con *function calling*) y, si la IA no está disponible, degrada al **guion scripteado**. Los leads se **persisten paso a paso** en MySQL (`wp_infouno_leads`) vía `lead.php`/`db_lead.php`, con scoring/VIP y aviso por email; el cierre ofrece agenda embebida y/o WhatsApp. **Todavía NO hay** WordPress/Elementor ni orquestación (Make/Node.js): esas dos capas siguen siendo objetivo.
 
 **Arquitectura objetivo (`ai/architecture.md`):**
 
@@ -34,9 +34,13 @@
 | `soluciones-ia.html` | Soluciones de IA. |
 | `casos.html` | Casos de éxito. |
 | `contacto.html` | Formulario / conversión. |
-| `assets/site.js` | **Toda la lógica frontend**: WhatsApp, calculadora ROI, bot "Uno", panel Tweaks, persistencia de leads (`postLead`). |
-| `lead.php` | Backend receptor de leads (DonWeb/cPanel + MySQL): upsert paso a paso, validaciones, scoring/VIP, email. |
-| `config.php` | Credenciales de MySQL y emails de notificación (completar en el server; no publicar). |
+| `assets/site.js` | **Toda la lógica frontend**: WhatsApp, calculadora ROI, bot "Uno" (modo IA + guion), agenda embebida, panel Tweaks, persistencia de leads (`postLead`). |
+| `chat.php` | Proxy del bot "Uno" a OpenAI (`gpt-4o-mini`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y fallback al guion. La API key vive solo aquí (vía `config.php`). |
+| `lead.php` | Receptor de leads (formulario + bot scripteado). Delega la persistencia en `db_lead.php`. |
+| `db_lead.php` | Persistencia compartida (`lead.php` + `chat.php`): sanitización, validación tel/email, mapeo a taxonomía, scoring/VIP (R3), upsert por `session_id` (R4) y email. |
+| `config.php` | Credenciales de MySQL, OpenAI y emails (completar en el server; **no se versiona**). |
+| `config.sample.php` | Plantilla versionada de `config.php`, sin credenciales. |
+| `ai-kb/kb_infouno.md` | Base de conocimiento del bot "Uno" (se inyecta en el system prompt de `chat.php`). |
 | `db/schema.sql` | DDL de la tabla `wp_infouno_leads` (pegar en phpMyAdmin). |
 | `assets/styles.css` | Estilos (temas dark/light, acentos, tipografías). |
 | `sin-publicar/uploads/blueprint_home_infouno.md` | Especificación funcional de la home (embudo). |

@@ -6,9 +6,9 @@
 
 ## 1. Resumen Ejecutivo
 
-El repositorio es un **MVP frontend estático** (HTML + CSS + un único JS), no la plataforma WordPress + IA + MySQL que describen los documentos de arquitectura. El sitio funciona como **máquina de captación de leads de bajo costo**: toda la conversión termina en un mensaje pre-armado de **WhatsApp** (`wa.me`). No hay backend, base de datos ni LLM en producción.
+El repositorio es un **sitio HTML estático** (7 páginas + `assets/`) con una **capa backend en PHP** sobre DonWeb/cPanel — todavía **no** la plataforma WordPress + Elementor que describen los documentos de arquitectura. Sobre ese MVP ya se sumaron las tres piezas que faltaban: **persistencia** (MySQL `wp_infouno_leads` vía `lead.php`/`db_lead.php`, paso a paso), **capa cognitiva** (bot "Uno" con OpenAI `gpt-4o-mini` vía `chat.php`, con fallback al guion scripteado) y **agenda** (agendador embebido). La conversión ofrece agenda y/o WhatsApp. Siguen pendientes **WordPress/Elementor** y la **orquestación** (Make/Node.js).
 
-Los documentos `architecture.md`, `taxonomy.md`, `rules.md`, `guardrails.md` y `checks.md` describen la **visión objetivo** (target). Este archivo marca la brecha y propone el camino.
+Los documentos `architecture.md`, `taxonomy.md`, `rules.md`, `guardrails.md` y `checks.md` describen la **visión objetivo** (target). Este archivo marca la brecha restante y el camino.
 
 ---
 
@@ -23,12 +23,17 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 ├── nosotros.html           Nosotros
 ├── contacto.html           Formulario de contacto → WhatsApp + lead.php
 ├── privacidad.html         Política de privacidad (Ley 25.326)
-├── lead.php                Backend de captura de leads (DonWeb/cPanel + MySQL)
-├── config.php              Credenciales MySQL + emails (completar en el server)
+├── chat.php                Proxy del bot "Uno" a OpenAI (function calling, fallback al guion)
+├── lead.php                Receptor de leads (formulario + bot) → delega en db_lead.php
+├── db_lead.php             Persistencia compartida: sanitización + validación + scoring/VIP + upsert + email
+├── config.php              Credenciales MySQL + OpenAI + emails (NO se versiona)
+├── config.sample.php       Plantilla versionada de config.php (sin credenciales)
 ├── assets/
-│   ├── site.js             TODA la lógica frontend: WhatsApp, calculadora, bot "Uno", leads, Tweaks
+│   ├── site.js             TODA la lógica frontend: WhatsApp, calculadora, bot "Uno", agenda, leads, Tweaks
 │   ├── styles.css          Estilos (temas dark/light, acentos, tipografías)
 │   └── logo.png
+├── ai-kb/
+│   └── kb_infouno.md       Base de conocimiento del bot "Uno" (system prompt de chat.php)
 ├── db/
 │   └── schema.sql          DDL de la tabla wp_infouno_leads
 ├── ai/                     Documentación (análisis, arquitectura, taxonomía, reglas, guardrails, checks)
@@ -51,12 +56,12 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 | **WhatsApp helper** (`waLink`) | Construye links `wa.me` con mensaje codificado. Número en `window.INFOUNO`. | ✅ Implementado |
 | **Formulario contacto** | Captura nombre/empresa/interés/mensaje y abre WhatsApp con el resumen. | ✅ Implementado (solo `contacto.html`) |
 | **Calculadora ROI** | Sliders (horas WhatsApp/stock, costo/hora) → horas y ahorro/mes + ROI. CTA → WhatsApp. Costo auto fijo $90.000. | ✅ Implementado (solo `index.html`) |
-| **Bot "Uno"** | Flujo conversacional **scripteado**: rubro → nombre → diagnóstico → web → equipo (3 tramos) → WhatsApp → email (opcional) → mensaje final `wa.me`. Persiste cada paso en `lead.php`. | ✅ Implementado (solo `index.html`) |
+| **Bot "Uno"** | Modo **IA** (`chat.php` → OpenAI) o, como fallback, **guion scripteado**: rubro → nombre → diagnóstico → web → equipo (3 tramos) → WhatsApp → email (opcional) → cierre (agenda/WhatsApp). Persiste cada paso vía `lead.php`/`chat.php`. | ✅ Implementado (solo `index.html`) |
 | **Apertura proactiva del bot** | `setTimeout` a 5s; una vez por sesión vía `sessionStorage('botSeen')`. | ✅ Implementado (sin exit-intent) |
 | **Panel "Tweaks"** | Tema dark/light, color de acento, tipografía. Persiste en `localStorage`, integra `postMessage` con editor visual. | ✅ Implementado |
 | **Animaciones reveal / nav móvil** | IntersectionObserver + toggle de menú. | ✅ Implementado |
 
-**El bot NO usa IA.** Las respuestas "por rubro" son una plantilla fija; no hay clasificación, ni LLM, ni RAG. La única defensa de seguridad presente es `escapeHtml()` al renderizar lo que el usuario tipea en el chat (mitiga XSS en el propio widget).
+**El bot "Uno" tiene dos modos.** Si `chat.php` está habilitado (hay `openai_key` y `chat_enabled`), corre en **modo IA** (OpenAI `gpt-4o-mini`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y la base de conocimiento de `ai-kb/kb_infouno.md` inyectada en el system prompt; si no, degrada al **guion scripteado** (plantilla fija por pasos). Defensas: `escapeHtml()` en el frontend (XSS del widget) y, en backend, *prepared statements* (mysqli) + sanitización en `db_lead.php`. Aún **no hay RAG**: la KB se inyecta entera, sin recuperación selectiva.
 
 ---
 
@@ -83,11 +88,12 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 
 ## 5. Riesgos y Observaciones
 
-1. **Pérdida de leads:** sin persistencia, si el usuario no toca "Confirmar por WhatsApp", el lead se pierde por completo (contradice R4).
-2. **Sin trazabilidad:** no se capturan UTM ni origen de campaña → no se puede medir qué canal convierte (contradice Check de Trazabilidad SEO).
-3. **Validación inexistente:** teléfono y email entran como texto libre → datos sucios (contradice Checks de sintaxis/dominio).
-4. **Coherencia de marketing:** las páginas dicen "WordPress + MySQL + IA real", pero el sitio es estático sin IA. Es copy aspiracional; alinear discurso con entregable para no sobreprometer.
-5. **Privacidad (Ley 25.326):** confirmar que existe aviso de privacidad y T&C antes de capturar datos personales.
+1. **Pérdida de leads:** ✅ mitigado. `site.js` persiste paso a paso vía `fetch('/lead.php')` con `keepalive`; el lead queda registrado aunque el usuario no llegue al cierre (R4).
+2. **Trazabilidad:** ✅ mitigado. Se capturan UTM en `sessionStorage` y se guardan junto al lead (Check de Trazabilidad SEO).
+3. **Validación de datos:** ✅ mitigado en backend. `db_lead.php` normaliza el teléfono (AR) y valida el email (formato + bloqueo de desechables) antes de persistir.
+4. **Coherencia de marketing:** parcialmente vigente. El copy menciona "WordPress + MySQL", pero el frontend es HTML estático (sí hay IA real en el bot y MySQL en el backend). Alinear el discurso con el entregable para no sobreprometer la parte de WordPress.
+5. **Dependencia de OpenAI / costo:** nuevo riesgo. El modo IA depende de la API de OpenAI; `chat.php` topea turnos (16) y `max_tokens` para acotar costo y degrada al guion si la API falla. Conviene monitorear gasto y errores 5xx.
+6. **Privacidad (Ley 25.326):** ✅ cubierto. `privacidad.html`, nota de consentimiento en el bot y bajo el formulario, y link "Privacidad" en el footer de todas las páginas.
 
 ---
 
