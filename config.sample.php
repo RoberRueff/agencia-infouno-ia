@@ -22,9 +22,16 @@ return [
   'notify_email' => 'ventas@infouno.com.ar',     // a dónde llegan los avisos
   'from_email'   => 'no-reply@infouno.com.ar',   // remitente (mejor un buzón de tu dominio)
 
-  // --- Agente conversacional (OpenAI) ---
-  // Pegá tu API key (sk-...) SOLO acá, en el server. Si queda vacía, el bot usa el guion scripteado.
-  'openai_key'   => '',
-  'openai_model' => 'gpt-4o-mini',   // cambiable a 'gpt-4o' si querés
+  // --- Agente conversacional (LLM con function calling) ---
+  // El bot funciona con cualquier API compatible con OpenAI Chat Completions que soporte
+  // tool calling. Pegá la API key SOLO acá, en el server. Si queda vacía, el bot usa el guion.
+  'openai_key'   => '',              // la key del proveedor que apunte 'api_base' (sk-... o AIza...)
+  //
+  // 'api_base' define a qué proveedor se llama. Ejemplos:
+  //   OpenAI  → 'https://api.openai.com/v1/chat/completions'              + model 'gpt-4o-mini'
+  //   Gemini  → 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' + model 'gemini-2.5-flash'
+  // Si lo dejás vacío, usa OpenAI por defecto.
+  'api_base'     => 'https://api.openai.com/v1/chat/completions',
+  'openai_model' => 'gpt-4o-mini',   // OpenAI: 'gpt-4o-mini' / 'gpt-4o' · Gemini: 'gemini-2.5-flash'
   'chat_enabled' => true,            // false = forzar el guion scripteado
 ];

@@ -37,7 +37,9 @@ WordPress (Core v6+) optimizado para **Core Web Vitals** (LCP < 2.5s). Los scrip
 
 ### Capa Cognitiva (IA Engine)
 
-Procesamiento de lenguaje a través de la **API de OpenAI** (Modelos GPT-4o o superiores) con una temperatura estricta (*T = 0.3*) para mitigar alucinaciones y garantizar un enfoque comercial directo.
+Procesamiento de lenguaje a través de una **API compatible con OpenAI Chat Completions** con *function calling*, temperatura estricta (*T = 0.3*) para mitigar alucinaciones y enfoque comercial directo. El **endpoint es configurable** en `config.php` (`api_base`), así que el mismo `chat.php` corre indistintamente sobre **OpenAI** (`gpt-4o-mini`/`gpt-4o`) o **Google Gemini** (`gemini-2.5-flash`, vía su endpoint compatible con OpenAI) cambiando solo la config.
+
+> ⚠️ **Privacidad (Ley 25.326):** el bot envía PII del lead al LLM. Los tiers gratuitos (p. ej. Gemini free) pueden usar los datos para entrenar; para producción conviene un tier pago (OpenAI API o Gemini con billing), que no entrena con los datos.
 
 ### Capa de Datos (Persistencia)
 

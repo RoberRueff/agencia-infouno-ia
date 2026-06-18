@@ -144,7 +144,7 @@ for ($i = 0; $i < 3; $i++) {
 // Si agotó el bucle de tools sin texto final
 echo json_encode(['ok' => true, 'reply' => '¿Coordinamos una llamada de 15 min para verlo en detalle?', 'readyToClose' => $readyToClose, 'leadFields' => new stdClass()]);
 
-/** Llama a OpenAI Chat Completions. Devuelve el array decodificado o null. */
+/** Llama a un endpoint Chat Completions (OpenAI / Gemini / compatible). Devuelve el array decodificado o null. */
 function infouno_openai($cfg, $messages, $tools) {
   $payload = json_encode([
     'model'       => $cfg['openai_model'] ?? 'gpt-4o-mini',
@@ -153,7 +153,9 @@ function infouno_openai($cfg, $messages, $tools) {
     'messages'    => $messages,
     'tools'       => $tools,
   ]);
-  $ch = curl_init('https://api.openai.com/v1/chat/completions');
+  // Endpoint configurable (config.php → 'api_base'). Por defecto, OpenAI.
+  $endpoint = !empty($cfg['api_base']) ? $cfg['api_base'] : 'https://api.openai.com/v1/chat/completions';
+  $ch = curl_init($endpoint);
   curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
