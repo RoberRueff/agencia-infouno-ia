@@ -186,7 +186,7 @@ function initBot() {
   function open() {
     bot.classList.add('open'); fab.classList.add('hide'); opened = true;
     clearTimeout(autoTimer);
-    if (step === 0) flow();
+    if (step === 0) startBot();
   }
   function close() { bot.classList.remove('open'); fab.classList.remove('hide'); }
   fab.addEventListener('click', open);
@@ -228,6 +228,107 @@ function initBot() {
     foot.appendChild(row); setTimeout(() => inp.focus(), 100);
   }
   function clearFoot() { foot.innerHTML = ''; }
+
+  // Burbuja "pensando" que se rellena cuando llega la respuesta async
+  function thinking() {
+    const t = document.createElement('div'); t.className = 'bmsg';
+    t.innerHTML = `<div class="bav">${botIco}</div><div class="bb btyping-wrap"><span class="btyping"><i></i><i></i><i></i></span></div>`;
+    body.appendChild(t); scroll(); return t;
+  }
+  // Rellena como TEXTO PLANO (G3: nunca innerHTML con texto del modelo)
+  function fillText(t, text) {
+    const bb = t.querySelector('.bb'); bb.classList.remove('btyping-wrap');
+    bb.textContent = text; scroll();
+  }
+  // Botones de cierre (agenda + WhatsApp). Compartido por guion e IA.
+  function renderCierre() {
+    clearFoot();
+    const wrap = document.createElement('div'); wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.gap = '8px';
+    const summary = `Hola Infouno 👋 Soy ${lead.nombre || ''}.\nRubro: ${lead.rubro || ''}\nWeb: ${lead.web || ''}\nEquipo: ${lead.equipo || ''}\nMi WhatsApp: ${lead.whatsapp || ''}${lead.email ? '\nEmail: ' + lead.email : ''}\nQuiero agendar la consultoría gratuita de 15 min.`;
+    if (agendaConfigured()) {
+      const cal = document.createElement('button'); cal.type = 'button'; cal.className = 'btn btn--block';
+      cal.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Agendar mi reunión';
+      cal.addEventListener('click', () => openAgenda({ name: lead.nombre, email: lead.email }));
+      wrap.appendChild(cal);
+    }
+    const a = document.createElement('a'); a.href = waLink(summary); a.target = '_blank'; a.rel = 'noopener';
+    a.className = agendaConfigured() ? 'btn btn--ghost btn--block' : 'btn btn--wa btn--block';
+    a.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Z"/></svg> '
+      + (agendaConfigured() ? 'O coordinar por WhatsApp' : 'Confirmar por WhatsApp');
+    wrap.appendChild(a);
+    foot.appendChild(wrap);
+  }
+
+  // ---- Modo IA: conversación libre ----
+  const aiHistory = [];
+  let aiTurns = 0, aiBusy = false;
+  const AI_GREETING = '¡Hola! 👋 Soy Uno, el asistente de Infouno. Contame, ¿a qué se dedica tu negocio? Así te muestro cómo podemos ayudarte.';
+
+  function aiStart() {
+    step = 1;
+    const t = thinking();
+    setTimeout(() => {
+      fillText(t, AI_GREETING);
+      aiHistory.push({ role: 'assistant', content: AI_GREETING });
+      aiInput();
+    }, 500);
+  }
+
+  function aiInput() {
+    foot.innerHTML = '';
+    const row = document.createElement('div'); row.className = 'bot__inrow';
+    row.innerHTML = `<input type="text" placeholder="Escribí tu mensaje…"><button aria-label="Enviar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button>`;
+    const inp = row.querySelector('input'), btn = row.querySelector('button');
+    const send = () => {
+      const v = inp.value.trim();
+      if (!v || aiBusy) return;
+      meSay(v); aiSend(v);
+    };
+    btn.onclick = send; inp.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+    foot.appendChild(row); setTimeout(() => inp.focus(), 100);
+  }
+
+  function aiSend(text) {
+    aiBusy = true; aiTurns++;
+    aiHistory.push({ role: 'user', content: text });
+    let utm = {};
+    try { utm = JSON.parse(sessionStorage.getItem('leadUTM') || '{}'); } catch (e) { }
+    const t = thinking();
+    fetch('/chat.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ session_id: leadSession(), page: location.pathname, messages: aiHistory }, utm))
+    })
+      .then(r => r.json())
+      .then(d => {
+        aiBusy = false;
+        if (!d || d.ok === false || (!d.reply && !d.readyToClose)) { fillText(t, 'Uy, tuve un problemita. Sigamos por WhatsApp 👇'); renderCierre(); return; }
+        if (d.leadFields) Object.assign(lead, mapLeadFields(d.leadFields));
+        if (d.reply) { fillText(t, d.reply); aiHistory.push({ role: 'assistant', content: d.reply }); }
+        else { t.remove(); }
+        if (d.readyToClose) renderCierre(); else aiInput();
+      })
+      .catch(() => { aiBusy = false; fillText(t, 'Uy, se me cortó la conexión. Coordinemos por WhatsApp 👇'); renderCierre(); });
+  }
+
+  // Mapea los campos que devuelve chat.php (en/es) al objeto lead local
+  function mapLeadFields(f) {
+    return { nombre: f.name, rubro: f.rubro, web: f.web, equipo: f.equipo, whatsapp: f.whatsapp, email: f.email };
+  }
+
+  // Decide el modo: IA si chat.php está habilitado, si no el guion scripteado
+  function startBot() {
+    step = 1;
+    const t = thinking();
+    let settled = false;
+    const ctrl = ('AbortController' in window) ? new AbortController() : null;
+    const finishOnce = (fn) => { if (settled) return; settled = true; clearTimeout(timer); t.remove(); step = 0; fn(); };
+    const timer = setTimeout(() => { if (ctrl) ctrl.abort(); finishOnce(flow); }, 3500);
+    fetch('/chat.php', ctrl ? { signal: ctrl.signal } : undefined)
+      .then(r => r.json())
+      .then(d => finishOnce((d && d.enabled) ? aiStart : flow))
+      .catch(() => finishOnce(flow));
+  }
 
   function flow() {
     step = 1;

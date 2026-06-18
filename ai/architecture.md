@@ -3,6 +3,8 @@
 La arquitectura sigue un enfoque **desacoplado e híbrido** (*Hybrid AI-First Architecture*). Aprovecha la madurez y el rendimiento para indexación SEO de WordPress junto con el procesamiento cognitivo de modelos LLM.
 
 > ⚠️ **Estado actual vs objetivo:** este documento describe la **arquitectura objetivo (target)**. El repositorio implementa hoy un **MVP frontend estático** (HTML + CSS + un único `assets/site.js`) cuyos leads se entregan por WhatsApp, sin WordPress, MySQL ni OpenAI. Ver la brecha completa y el roadmap en [`ai/analysis.md`](analysis.md).
+>
+> **Actualización (capa cognitiva):** el bot "Uno" ya tiene modo IA real vía `chat.php` (OpenAI `gpt-4o-mini`, T=0.3) con function calling para captar leads, y degrada al guion scripteado si la IA no está disponible. La clave vive en `config.php` (backend).
 
 ## Diagrama de Capas
 

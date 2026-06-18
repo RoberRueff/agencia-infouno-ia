@@ -65,7 +65,7 @@ infouno-agencia-ia/                 (raíz = solo lo que se publica/opera)
 | Área | Objetivo documentado | Estado real | Brecha |
 |---|---|---|---|
 | **Frontend** | WordPress v6+ + Elementor (SSR, Core Web Vitals) | HTML estático servido tal cual | Migrar a WP o asumir estático como definitivo |
-| **Motor IA** | OpenAI GPT-4o, T=0.3, RAG | Flujo scripteado, sin LLM | No hay capa cognitiva |
+| **Motor IA** | OpenAI GPT-4o, T=0.3, RAG | Agente conversacional con `gpt-4o-mini` (T=0.3) vía `chat.php`, con fallback al guion | ✅ Implementado (KB en archivo, sin RAG por ahora) |
 | **Persistencia** | MySQL `wp_infouno_leads` | Ninguna; lead va por WhatsApp | No se almacena ni puntúa nada |
 | **Orquestación** | Make / Node.js + webhooks HTTPS | Ninguna | Sin middleware |
 | **Taxonomía URLs** | Silos `/soluciones/…`, `/casos-exito/…` | Archivos planos `.html` | URLs no coinciden con el plan SEO |
