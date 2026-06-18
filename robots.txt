@@ -1,0 +1,19 @@
+# Infouno — robots.txt
+# Permitimos el rastreo de las páginas públicas y bloqueamos backend / material interno.
+
+User-agent: *
+Allow: /
+
+# Endpoints de backend y archivos internos (no deben indexarse)
+Disallow: /chat.php
+Disallow: /lead.php
+Disallow: /db_lead.php
+Disallow: /config.php
+Disallow: /config.sample.php
+Disallow: /sin-publicar/
+Disallow: /ai/
+Disallow: /ai-kb/
+Disallow: /db/
+Disallow: /seo/
+
+Sitemap: https://infouno.com.ar/sitemap.xml

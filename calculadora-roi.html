@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de ROI de automatización para PyMEs — Infouno</title>
+<meta name="description" content="Calculá gratis cuánto tiempo y dinero puede ahorrar tu PyME automatizando WhatsApp, stock y tareas repetitivas con IA. Resultado estimado en tiempo real.">
+<link rel="canonical" href="https://infouno.com.ar/calculadora-roi.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="Infouno">
+<meta property="og:title" content="Calculadora de ROI de automatización para PyMEs — Infouno">
+<meta property="og:description" content="Calculá gratis cuánto tiempo y dinero puede ahorrar tu PyME automatizando WhatsApp, stock y tareas repetitivas con IA.">
+<meta property="og:url" content="https://infouno.com.ar/calculadora-roi.html">
+<meta property="og:image" content="https://infouno.com.ar/assets/logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Calculadora de ROI de automatización para PyMEs — Infouno">
+<meta name="twitter:description" content="Calculá gratis cuánto tiempo y dinero puede ahorrar tu PyME automatizando WhatsApp, stock y tareas repetitivas con IA.">
+<meta name="twitter:image" content="https://infouno.com.ar/assets/logo.png">
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="assets/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cómo se calcula el ahorro de automatizar?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Estimamos cuántas horas por día dedicás a tareas repetitivas, como responder WhatsApp o cargar stock, y qué parte de esas horas puede resolver la automatización. Multiplicamos las horas recuperadas al mes por tu costo por hora para darte un ahorro estimado." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿El resultado de la calculadora es exacto?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Es una estimación referencial sobre días hábiles, pensada para darte una idea rápida. El número real lo ajustamos en tu diagnóstico gratuito, según tu negocio y tus procesos." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué tareas de mi PyME puedo automatizar?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Las más comunes son la atención por WhatsApp, la carga y consulta de stock, el seguimiento de leads y las respuestas a preguntas frecuentes. Si tenés un proceso propio, lo desarrollamos a medida con IA." }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="nav" data-screen-label="calculadora-roi">
+  <div class="wrap nav__row">
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Infouno"><span>info<b>uno</b></span></a>
+    <nav class="nav__links">
+      <a href="servicios.html">Diseños con IA</a>
+      <a href="soluciones-ia.html">Automatizaciones de procesos</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="btn btn--ghost" href="contacto.html">Hablemos</a>
+      <a class="btn btn--wa" data-wa="Hola Infouno 👋 Quiero un diagnóstico gratuito para mi negocio.">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.2 8.2 0 0 1 2.42 5.82c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.25-8.25Zm-4.5 4.3c-.21 0-.55.08-.84.39-.29.31-1.1 1.07-1.1 2.62s1.13 3.04 1.29 3.25c.16.21 2.21 3.38 5.42 4.62.76.29 1.35.46 1.81.6.76.24 1.45.21 2 .13.61-.09 1.88-.77 2.15-1.51.27-.74.27-1.38.19-1.51-.08-.13-.29-.21-.61-.37Z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+    <button class="nav__toggle" aria-label="Menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="hero__bg"><div class="gline"></div><div class="glow glow--acc" style="width:560px;height:560px;top:-240px;left:60%"></div></div>
+  <div class="wrap">
+    <span class="eyebrow">Calculadora gratuita</span>
+    <h1 class="h-display">Calculadora de ROI:<br><span class="grad-text">cuánto ahorra tu PyME automatizando</span></h1>
+    <p class="lead">Cada hora que tu equipo pasa respondiendo WhatsApp o cargando stock es plata que se va. Movés tres controles y ves, en tiempo real, cuánto tiempo y dinero podrías recuperar automatizando con IA.</p>
+  </div>
+</section>
+
+<!-- ===== CALCULADORA (widget reutilizado, lógica en site.js → initCalc) ===== -->
+<section class="section bg-soft" id="calculadora">
+  <div class="glow glow--acc" style="width:520px;height:520px;top:0;left:-220px;opacity:.45"></div>
+  <div class="wrap" style="position:relative;z-index:1">
+    <div class="s-head">
+      <span class="eyebrow">Calculá tu ahorro</span>
+      <h2 class="h-1">¿Cuánto tiempo perdés por<br>semana en tareas manuales?</h2>
+      <p class="lead">Mové los controles y la IA calcula tu ahorro potencial en tiempo real.</p>
+    </div>
+    <div class="calc reveal">
+      <div class="calc__grid">
+        <div class="calc__controls">
+          <div class="ctl">
+            <div class="ctl__top"><label for="calc-wa">Horas en WhatsApp por día</label><span class="ctl__val" id="v-wa">3 hs</span></div>
+            <input class="rng" type="range" id="calc-wa" min="0" max="8" step="0.5" value="3">
+          </div>
+          <div class="ctl">
+            <div class="ctl__top"><label for="calc-stock">Horas cargando stock por día</label><span class="ctl__val" id="v-stock">2 hs</span></div>
+            <input class="rng" type="range" id="calc-stock" min="0" max="6" step="0.5" value="2">
+          </div>
+          <div class="ctl">
+            <div class="ctl__top"><label for="calc-cost">Costo por hora de trabajo</label><span class="ctl__val" id="v-cost">$5.000</span></div>
+            <input class="rng" type="range" id="calc-cost" min="1000" max="20000" step="500" value="5000">
+          </div>
+          <p class="muted" style="font-size:.86rem;margin-top:4px">Estimación referencial sobre días hábiles. El resultado real lo ajustamos en tu diagnóstico.</p>
+        </div>
+        <div class="calc__out">
+          <div class="out-card">
+            <div class="ol">Horas ahorradas al mes</div>
+            <div class="ov" id="r-horas">—</div>
+          </div>
+          <div class="out-card hl">
+            <div class="ol">Ahorro estimado por mes</div>
+            <div class="ov" id="r-ahorro">—</div>
+            <div class="os">en costo de tiempo operativo</div>
+          </div>
+          <div class="out-card">
+            <div class="ol">ROI estimado de automatizar</div>
+            <div class="ov" id="r-roi">—</div>
+          </div>
+          <a class="btn btn--wa btn--block" id="calc-cta" href="#">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Z"/></svg>
+            Quiero automatizar mi negocio →
+          </a>
+          <p class="muted" style="font-size:.82rem;text-align:center">Te enviamos el análisis completo por WhatsApp.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CÓMO LO CALCULAMOS ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="eyebrow eyebrow--green">Cómo lo calculamos</span>
+      <h2 class="h-1">Del tiempo perdido al ahorro real</h2>
+    </div>
+    <div class="grid g-3">
+      <div class="card"><h3>1 · Tus horas manuales</h3><p>Sumás las horas que por día dedicás a responder WhatsApp y a cargar o consultar stock: las tareas repetitivas que más tiempo comen.</p></div>
+      <div class="card"><h3>2 · Lo que automatiza la IA</h3><p>Estimamos qué parte de esas horas puede resolver un asistente de IA: gran parte de la atención por WhatsApp y casi toda la gestión de stock.</p></div>
+      <div class="card"><h3>3 · Tu ahorro mensual</h3><p>Multiplicamos las horas que recuperás al mes por tu costo por hora y lo comparamos con la inversión de automatizar para mostrarte el ROI estimado.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ (SEO · FAQPage) ===== -->
+<section class="section bg-soft">
+  <div class="wrap">
+    <span class="eyebrow">Preguntas frecuentes</span>
+    <h2 class="h-1" style="margin:18px 0 30px">Sobre la calculadora de ROI</h2>
+    <div class="grid g-2">
+      <div class="card"><h3>¿Cómo se calcula el ahorro de automatizar?</h3><p>Estimamos cuántas horas por día dedicás a tareas repetitivas, como responder WhatsApp o cargar stock, y qué parte de esas horas puede resolver la automatización. Multiplicamos las horas recuperadas al mes por tu costo por hora para darte un ahorro estimado.</p></div>
+      <div class="card"><h3>¿El resultado de la calculadora es exacto?</h3><p>Es una estimación referencial sobre días hábiles, pensada para darte una idea rápida. El número real lo ajustamos en tu diagnóstico gratuito, según tu negocio y tus procesos.</p></div>
+      <div class="card"><h3>¿Qué tareas de mi PyME puedo automatizar?</h3><p>Las más comunes son la atención por WhatsApp, la carga y consulta de stock, el seguimiento de leads y las respuestas a preguntas frecuentes. Si tenés un proceso propio, lo desarrollamos a medida con IA.</p></div>
+    </div>
+    <p class="lead" style="margin-top:26px">¿Querés ver cómo funciona la IA que hace este trabajo? Conocé nuestras <a href="soluciones-ia.html" style="color:var(--acc-2);font-weight:600">soluciones de automatización con IA →</a></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <div class="deco"></div>
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px">
+        <span class="eyebrow">Diagnóstico gratuito · sin compromiso</span>
+        <h2 class="h-1" style="max-width:740px">¿Listo para convertir<br>ese ahorro en realidad?</h2>
+        <p class="lead" style="max-width:560px">Contanos qué vendés y en 15 minutos por WhatsApp te decimos qué automatizar primero para empezar a recuperar tiempo y dinero.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px">
+          <a class="btn btn--wa btn--lg" data-wa="Hola Infouno 👋 Usé la calculadora de ROI y quiero mi diagnóstico gratuito.">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Z"/></svg>
+            Escribinos por WhatsApp
+          </a>
+          <a class="btn btn--ghost btn--lg" href="contacto.html">Otras formas de contacto</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand"><img src="assets/logo.png" alt="Infouno"><span>info<b>uno</b></span></div>
+        <p style="max-width:320px">Consultora tecnológica argentina. Webs que convierten, procesos automatizados e inteligencia artificial aplicada a PyMEs.</p>
+        <div class="dotline" style="margin-top:22px"><i style="background:var(--green);color:var(--green)"></i><i style="background:var(--acc-2);color:var(--acc-2)"></i><i style="background:var(--yellow);color:var(--yellow)"></i><i style="background:var(--red);color:var(--red)"></i></div>
+      </div>
+      <div>
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="servicios.html">Desarrollo Web</a></li>
+          <li><a href="servicios.html">Ecommerce</a></li>
+          <li><a href="servicios.html">SEO</a></li>
+          <li><a href="calculadora-roi.html">Calculadora ROI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>IA</h4>
+        <ul>
+          <li><a href="soluciones-ia.html">IA para WhatsApp</a></li>
+          <li><a href="soluciones-ia.html">IA para Ventas</a></li>
+          <li><a href="soluciones-ia.html">IA para Atención</a></li>
+          <li><a href="soluciones-ia.html">Procesos Internos</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="casos.html">Casos de Éxito</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a data-wa="Hola Infouno 👋">WhatsApp</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span data-year>2026</span> Infouno · infouno.com.ar — Todos los derechos reservados. · <a href="privacidad.html" style="color:inherit;text-decoration:underline">Privacidad</a></span>
+      <span>Hecho en Argentina 🇦🇷 con tecnología de Anthropic + Claude.</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" data-wa="Hola Infouno 👋 Quiero más información.">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.2 8.2 0 0 1 2.42 5.82c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.25-8.25Zm-4.5 4.3c-.21 0-.55.08-.84.39-.29.31-1.1 1.07-1.1 2.62s1.13 3.04 1.29 3.25c.16.21 2.21 3.38 5.42 4.62.76.29 1.35.46 1.81.6.76.24 1.45.21 2 .13.61-.09 1.88-.77 2.15-1.51.27-.74.27-1.38.19-1.51-.08-.13-.29-.21-.61-.37Z"/></svg>
+  <span>Escribinos</span>
+</a>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

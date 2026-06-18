@@ -32,6 +32,7 @@
 | `nosotros.html` | Página "Nosotros". |
 | `servicios.html` | Catálogo de servicios. |
 | `soluciones-ia.html` | Soluciones de IA. |
+| `calculadora-roi.html` | Landing de la calculadora de ROI (widget reutilizado de `site.js`; imán de tráfico SEO). |
 | `casos.html` | Casos de éxito. |
 | `contacto.html` | Formulario / conversión. |
 | `assets/site.js` | **Toda la lógica frontend**: WhatsApp, calculadora ROI, bot "Uno" (modo IA + guion), agenda embebida, panel Tweaks, persistencia de leads (`postLead`). |
@@ -40,6 +41,8 @@
 | `db_lead.php` | Persistencia compartida (`lead.php` + `chat.php`): sanitización, validación tel/email, mapeo a taxonomía, scoring/VIP (R3), upsert por `session_id` (R4) y email. |
 | `config.php` | Credenciales de MySQL, OpenAI y emails (completar en el server; **no se versiona**). |
 | `config.sample.php` | Plantilla versionada de `config.php`, sin credenciales. |
+| `robots.txt` | Reglas de rastreo (bloquea backend/internos) + referencia al `sitemap.xml`. |
+| `sitemap.xml` | Mapa de las 7 URLs públicas para Google Search Console. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento del bot "Uno" (se inyecta en el system prompt de `chat.php`). |
 | `db/schema.sql` | DDL de la tabla `wp_infouno_leads` (pegar en phpMyAdmin). |
 | `assets/styles.css` | Estilos (temas dark/light, acentos, tipografías). |
@@ -52,6 +55,8 @@
 | `ai/guardrails.md` | Barreras de seguridad y control de la IA (scope, precios, SQLi/XSS, Ley 25.326). |
 | `ai/checks.md` | Verificaciones del embudo en tiempo real (teléfono, email, agenda, UTM). |
 | `ai/templates/execution.md` | Esqueleto de trabajo de la sesión. |
+| `seo/` | Documentación y seguimiento SEO (keyword map, bitácora, checklist manual). Solo docs; `robots.txt`/`sitemap.xml` y las páginas viven en la raíz. |
+| `robots.txt` / `sitemap.xml` | Archivos funcionales SEO (raíz). Reglas de rastreo y mapa de URLs. |
 
 ## Paso 4 — Restricciones y Prioridades
 

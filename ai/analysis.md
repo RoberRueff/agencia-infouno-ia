@@ -18,6 +18,7 @@ Los documentos `architecture.md`, `taxonomy.md`, `rules.md`, `guardrails.md` y `
 agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 ├── index.html              Home: hero, dolores, calculadora, servicios, bot "Uno", confianza, CTA
 ├── soluciones-ia.html      Página de soluciones de IA
+├── calculadora-roi.html    Landing de la calculadora de ROI (imán de tráfico SEO)
 ├── servicios.html          Servicios
 ├── casos.html              Casos de éxito
 ├── nosotros.html           Nosotros
@@ -28,6 +29,8 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 ├── db_lead.php             Persistencia compartida: sanitización + validación + scoring/VIP + upsert + email
 ├── config.php              Credenciales MySQL + OpenAI + emails (NO se versiona)
 ├── config.sample.php       Plantilla versionada de config.php (sin credenciales)
+├── robots.txt              Reglas de rastreo + referencia al sitemap (SEO)
+├── sitemap.xml             Mapa de las 7 URLs públicas para Search Console (SEO)
 ├── assets/
 │   ├── site.js             TODA la lógica frontend: WhatsApp, calculadora, bot "Uno", agenda, leads, Tweaks
 │   ├── styles.css          Estilos (temas dark/light, acentos, tipografías)
@@ -44,7 +47,7 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
     └── screenshots/              Capturas (caja de dolores)
 ```
 
-- **Páginas:** 7 públicas (navegación: Home · Soluciones · Servicios · Casos · Nosotros · Contacto · Privacidad).
+- **Páginas:** 8 públicas (Home · Soluciones · Servicios · Casos · Nosotros · Contacto · Privacidad · Calculadora ROI).
 - **Dependencias externas:** ninguna en runtime salvo Google Fonts (carga condicional desde el panel Tweaks). Sin frameworks, sin build.
 
 ---
@@ -111,6 +114,19 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 - ✅ Endpoint `lead.php` que recibe cada paso del bot y el formulario vía `fetch` (cumple R4, upsert por `session_id`).
 - ✅ Guarda leads con el esquema de `taxonomy.md` (`db/schema.sql`); calcula `lead_scoring` y marca VIP (R3); avisa por email.
 - ✅ Agenda resuelta con **agendador embebido** (modal en `site.js`, integrado en bot, contacto y CTA del home; URL en `window.INFOUNO.agenda`).
+
+**Fase 1.5 — Baseline SEO on-page** ✅ implementada sobre el HTML estático (Sprint 1)
+- ✅ `robots.txt` (bloquea backend/internos) + `sitemap.xml` con las 7 URLs.
+- ✅ `canonical` + Open Graph + Twitter Card en las 7 páginas.
+- ✅ Schema.org JSON-LD (`ProfessionalService` + `WebSite`) en el home.
+- ✅ `title`/`meta description` refinados con keywords nacionales (web con IA + automatización/chatbots para PyMEs Argentina).
+
+**Fase 1.6 — Contenido on-page + datos estructurados** ✅ implementada (Sprint 2)
+- ✅ Sección FAQ visible (6 Q&A) + `FAQPage` JSON-LD en `servicios.html` (web con IA) y `soluciones-ia.html` (automatización/chatbots), con texto espejo schema↔visible.
+- ✅ Interlinking bidireccional entre los dos pilares (refuerza el silo SEO) vía CTA al pie de cada FAQ.
+- ✅ FAQ alineado a la narrativa de marca (Anthropic/Claude) y al guardrail G2 (sin precios).
+- ✅ Landing dedicada de la **calculadora de ROI** (`calculadora-roi.html`): widget reutilizado (`initCalc` en `site.js`), copy propio orientado a ahorro/ROI, explicador, FAQ + `FAQPage`, en sitemap y enlazada desde el footer de todo el sitio.
+- Pendiente (Sprint 2+): FAQ en el home, imagen OG dedicada (1200×630), migración a silos `/soluciones/…` con redirects 301.
 
 **Fase 2 — Plataforma objetivo**
 - Migrar a WordPress + MySQL si el negocio lo justifica; mantener Core Web Vitals.

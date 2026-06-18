@@ -14,6 +14,7 @@ Una correcta taxonomía estructura el sitio para que Google entienda perfectamen
 |---|---|
 | `/index.html` | `/` |
 | `/soluciones-ia.html` | `/soluciones/` |
+| `/calculadora-roi.html` | (herramienta / imán de leads, mantener) |
 | `/servicios.html` | (consolidar en `/soluciones/`) |
 | `/casos.html` | `/casos-exito/` |
 | `/nosotros.html` | `/nosotros/` |
