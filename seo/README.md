@@ -11,6 +11,7 @@ Centro de documentación y seguimiento del trabajo SEO. **Solo documentación**:
 | [keyword-map.md](keyword-map.md) | Investigación de palabras clave por pilar e intención. |
 | [log.md](log.md) | Bitácora de lo implementado (por sprint) y lo pendiente. |
 | [checklist.md](checklist.md) | Acciones manuales fuera del código (Search Console, GBP, OG, etc.). |
+| [dashboard-reporting.md](dashboard-reporting.md) | Plan del dashboard de reporting por cliente (GA4 + GSC + Looker). Estado: planificado. |
 
 ## Dónde vive cada cosa (no mover)
 
