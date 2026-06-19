@@ -29,7 +29,7 @@ Sitio corporativo + chatbot "Uno" para **captar y cualificar leads** de PyMEs ar
 | `assets/site.js` | Toda la lógica frontend: WhatsApp, calculadora ROI, bot "Uno" (IA + guion), agenda, leads, Tweaks. |
 | `chat.php` | Proxy del bot a OpenAI (function calling + fallback). La API key vive solo aquí (vía `config.php`). |
 | `lead.php` / `db_lead.php` | Recepción y persistencia de leads (upsert por `session_id`, scoring/VIP, email). |
-| `config.php` | Credenciales MySQL + OpenAI + emails. **No se versiona** (`.gitignore`); plantilla en `config.sample.php`. |
+| `config.php` | Credenciales MySQL + LLM (`api_base`/key) + emails. **No se versiona** (`.gitignore`); plantilla en `config.sample.php`. Guía de deploy en `ai/deploy-checklist.md`. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento inyectada en el system prompt de `chat.php`. |
 | `db/schema.sql` | DDL de `wp_infouno_leads`. |
 | `ai/` | Documentación: protocolo, análisis, arquitectura, taxonomía, reglas, guardrails, checks. |

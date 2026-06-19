@@ -55,6 +55,7 @@
 | `ai/guardrails.md` | Barreras de seguridad y control de la IA (scope, precios, SQLi/XSS, Ley 25.326). |
 | `ai/checks.md` | Verificaciones del embudo en tiempo real (teléfono, email, agenda, UTM). |
 | `ai/templates/execution.md` | Esqueleto de trabajo de la sesión. |
+| `ai/deploy-checklist.md` | Procedimiento de deploy en DonWeb/cPanel + troubleshooting (config.php, MySQL, Gemini). |
 | `seo/` | Documentación y seguimiento SEO (keyword map, bitácora, checklist manual). Solo docs; `robots.txt`/`sitemap.xml` y las páginas viven en la raíz. |
 | `robots.txt` / `sitemap.xml` | Archivos funcionales SEO (raíz). Reglas de rastreo y mapa de URLs. |
 
