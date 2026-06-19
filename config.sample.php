@@ -34,4 +34,10 @@ return [
   'api_base'     => 'https://api.openai.com/v1/chat/completions',
   'openai_model' => 'gpt-4o-mini',   // OpenAI: 'gpt-4o-mini' / 'gpt-4o' · Gemini: 'gemini-2.5-flash'
   'chat_enabled' => true,            // false = forzar el guion scripteado
+
+  // --- Alerta de lead VIP por WhatsApp (vía Make) ---
+  // URL del webhook del escenario de Make. Vacío = alerta VIP desactivada (no cambia nada).
+  'make_webhook_url' => '',
+  // Secreto compartido que Make valida en el payload (poné cualquier string largo y random).
+  'make_token'       => '',
 ];
