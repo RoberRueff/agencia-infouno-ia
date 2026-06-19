@@ -74,12 +74,12 @@ function infouno_save_lead($cfg, $in) {
   if ($db->connect_errno) return ['ok' => false, 'error' => 'db'];
   $db->set_charset('utf8mb4');
 
-  // ¿Ya existe? (para no notificar dos veces)
-  $notified = 0;
-  $q = $db->prepare('SELECT lead_notified FROM wp_infouno_leads WHERE session_id = ? LIMIT 1');
+  // ¿Ya existe? (para no notificar dos veces: email y WhatsApp por separado)
+  $notified = 0; $vipNotified = 0;
+  $q = $db->prepare('SELECT lead_notified, lead_vip_notified FROM wp_infouno_leads WHERE session_id = ? LIMIT 1');
   $q->bind_param('s', $session);
   $q->execute();
-  if ($r = $q->get_result()->fetch_assoc()) $notified = (int) $r['lead_notified'];
+  if ($r = $q->get_result()->fetch_assoc()) { $notified = (int) $r['lead_notified']; $vipNotified = (int) $r['lead_vip_notified']; }
   $q->close();
 
   // Upsert por session_id (R4)
@@ -142,6 +142,46 @@ function infouno_save_lead($cfg, $in) {
     $u->bind_param('s', $session);
     $u->execute();
     $u->close();
+  }
+
+  // Alerta de lead VIP por WhatsApp (vía Make). Best-effort, NO bloqueante: nunca
+  // demora ni rompe el guardado. Solo VIP + accionable, una sola vez por lead.
+  if ($ok && $vip && $actionable && !$vipNotified && !empty($cfg['make_webhook_url'])) {
+    $waLink = $phoneValid ? ('https://wa.me/' . $phone) : '';
+    $payload = json_encode([
+      'token'      => $cfg['make_token'] ?? '',
+      'session_id' => $session,
+      'name'       => $name,
+      'rubro'      => $rubro,
+      'company'    => $company,
+      'phone'      => $phone,
+      'email'      => $email,
+      'web'        => $infra,
+      'equipo'     => $size,
+      'scoring'    => $score,
+      'vip'        => $vip,
+      'wa_link'    => $waLink,
+      'page'       => $page,
+      'utm'        => ['source' => $utm_s, 'medium' => $utm_m, 'campaign' => $utm_c],
+    ]);
+    $ch = curl_init($cfg['make_webhook_url']);
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_POST           => true,
+      CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+      CURLOPT_POSTFIELDS     => $payload,
+      CURLOPT_TIMEOUT        => 3,
+    ]);
+    $resp = @curl_exec($ch);
+    $cerr = curl_error($ch);
+    curl_close($ch);
+    if ($resp === false) @error_log('infouno: webhook Make fallo — ' . $cerr);
+
+    // Marca best-effort (al intentar): evita re-disparar en cada paso del bot.
+    $uv = $db->prepare('UPDATE wp_infouno_leads SET lead_vip_notified = 1 WHERE session_id = ?');
+    $uv->bind_param('s', $session);
+    $uv->execute();
+    $uv->close();
   }
 
   $db->close();
