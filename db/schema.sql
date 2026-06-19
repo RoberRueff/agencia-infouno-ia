@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS wp_infouno_leads (
   utm_medium           VARCHAR(120) DEFAULT NULL,
   utm_campaign         VARCHAR(150) DEFAULT NULL,
   lead_notified        TINYINT(1)   DEFAULT 0,                     -- 1 = ya se avisó por email
+  lead_vip_notified    TINYINT(1)   DEFAULT 0,                     -- 1 = ya se alertó al equipo por WhatsApp (Make)
   created_at           DATETIME     DEFAULT CURRENT_TIMESTAMP,
   updated_at           DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uq_session (session_id),
