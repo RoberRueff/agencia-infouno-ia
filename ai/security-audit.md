@@ -34,7 +34,7 @@ El riesgo más serio es **económico** (abuso del endpoint de IA), no de robo de
 
 ### 🔴 ALTO
 
-**H1 — Sin rate-limiting en `chat.php` → abuso económico (DoS financiero).** ✅ `RESUELTO (a993ade)` (verificar en server)
+**H1 — Sin rate-limiting en `chat.php` → abuso económico (DoS financiero).** ✅ `RESUELTO Y VERIFICADO EN PROD (429 confirmado)`
 Endpoint público sin throttling que proxea un LLM **pago**. El tope de 16 turnos es por
 conversación, no limita la cantidad de requests → un atacante puede quemar el presupuesto de API.
 - **Fix aplicado:** módulo `ratelimit.php` (file-based, sin deps) llamado en el POST de
@@ -88,7 +88,7 @@ No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
 |---|---|---|
 | 1 | M1 — fix `s()` anti email-injection | ✅ hecho (`df857dc`) |
 | 2 | M3 — headers de seguridad (`.htaccess`) | ✅ hecho (`df857dc`), **verificar en server** |
-| 3 | H1 — rate-limit en `chat.php` | ✅ hecho (`a993ade`), **verificar en server** + tope de gasto del proveedor (operativo) |
+| 3 | H1 — rate-limit en `chat.php` | ✅ hecho + **verificado en prod (429 OK)**. Falta: tope de gasto del proveedor (operativo) |
 | 4 | M2 — honeypot + Turnstile en el form | ⏳ pendiente |
 | 5 | L4 — SPF/DKIM/DMARC del dominio | ⏳ pendiente (DNS) |
 | 6 | L2/L3 — server_tokens off + forzar HTTPS/HSTS | ⏳ pendiente |
