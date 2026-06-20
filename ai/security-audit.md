@@ -34,11 +34,17 @@ El riesgo más serio es **económico** (abuso del endpoint de IA), no de robo de
 
 ### 🔴 ALTO
 
-**H1 — Sin rate-limiting en `chat.php` → abuso económico (DoS financiero).** `PENDIENTE`
+**H1 — Sin rate-limiting en `chat.php` → abuso económico (DoS financiero).** ✅ `RESUELTO (a993ade)` (verificar en server)
 Endpoint público sin throttling que proxea un LLM **pago**. El tope de 16 turnos es por
 conversación, no limita la cantidad de requests → un atacante puede quemar el presupuesto de API.
-- **Remediación:** rate-limit por IP (token-bucket en archivo/APCu/DB) + **tope de gasto diario**
-  en el panel del proveedor + idealmente Cloudflare delante. Nonce/PoW liviano para el widget.
+- **Fix aplicado:** módulo `ratelimit.php` (file-based, sin deps) llamado en el POST de
+  `chat.php` antes de tocar el LLM. Capas: por IP (15/min, 60/hora) + **tope global diario**
+  (1500, configurable en `config.php`). Detecta IP real tras openresty. 429 + fallback del bot.
+  Fail-open si el temp dir no es escribible (no rompe el bot).
+- **Verificar en server:** (1) que `infouno_client_ip()` devuelva la **IP real** del cliente y no
+  la del proxy (si no, todos comparten cupo → falsos positivos); (2) que al pasar el umbral
+  responda 429. **Complementar (operativo):** tope de gasto diario en el panel del proveedor
+  (Google AI Studio / OpenAI) e idealmente **Cloudflare** delante.
 
 ### 🟠 MEDIO
 
@@ -82,7 +88,7 @@ No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
 |---|---|---|
 | 1 | M1 — fix `s()` anti email-injection | ✅ hecho (`df857dc`) |
 | 2 | M3 — headers de seguridad (`.htaccess`) | ✅ hecho (`df857dc`), **verificar en server** |
-| 3 | H1 — rate-limit en `chat.php` + tope de gasto del proveedor | ⏳ pendiente |
+| 3 | H1 — rate-limit en `chat.php` | ✅ hecho (`a993ade`), **verificar en server** + tope de gasto del proveedor (operativo) |
 | 4 | M2 — honeypot + Turnstile en el form | ⏳ pendiente |
 | 5 | L4 — SPF/DKIM/DMARC del dominio | ⏳ pendiente (DNS) |
 | 6 | L2/L3 — server_tokens off + forzar HTTPS/HSTS | ⏳ pendiente |
