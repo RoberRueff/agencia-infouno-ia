@@ -20,6 +20,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 if (!$enabled) { echo json_encode(['ok' => true, 'enabled' => false, 'reply' => null]); exit; }
 
+// Rate limiting (H1): protege el endpoint pago del abuso económico. Solo POST.
+require_once __DIR__ . '/ratelimit.php';
+$rl = infouno_rate_check($cfg);
+if (!$rl['ok']) {
+  http_response_code(429);
+  echo json_encode(['ok' => false, 'error' => 'rate', 'reply' => 'Estoy recibiendo muchas consultas ahora mismo. Probá de nuevo en un minuto o escribinos por WhatsApp 👇']);
+  exit;
+}
+
 $in = json_decode(file_get_contents('php://input'), true);
 if (!is_array($in)) { http_response_code(400); echo json_encode(['ok' => false, 'error' => 'json']); exit; }
 
