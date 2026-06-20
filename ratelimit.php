@@ -7,20 +7,23 @@
    El tope global diario + el límite de gasto del proveedor son el salvavidas.
    ===================================================================== */
 
-/** IP real del cliente (detrás del proxy openresty de DonWeb). */
-function infouno_client_ip() {
-  $cands = [];
-  if (!empty($_SERVER['HTTP_X_REAL_IP'])) $cands[] = $_SERVER['HTTP_X_REAL_IP'];
-  if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-    $cands[] = $parts[0];
+/**
+ * IP real del cliente. Por defecto usa REMOTE_ADDR (no spoofeable a nivel HTTP).
+ * SOLO confía en X-Real-IP / X-Forwarded-For si $trustForwarded = true — porque headers
+ * que el proxy no setea/sobrescribe son falsificables por el cliente y permitirían evadir
+ * el límite por IP. Activar trust_forwarded solo detrás de un proxy de confianza (Cloudflare).
+ */
+function infouno_client_ip($trustForwarded = false) {
+  if ($trustForwarded) {
+    if (!empty($_SERVER['HTTP_X_REAL_IP']) && filter_var(trim($_SERVER['HTTP_X_REAL_IP']), FILTER_VALIDATE_IP))
+      return trim($_SERVER['HTTP_X_REAL_IP']);
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      $first = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+      if (filter_var($first, FILTER_VALIDATE_IP)) return $first;
+    }
   }
-  if (!empty($_SERVER['REMOTE_ADDR'])) $cands[] = $_SERVER['REMOTE_ADDR'];
-  foreach ($cands as $ip) {
-    $ip = trim($ip);
-    if (filter_var($ip, FILTER_VALIDATE_IP)) return $ip;
-  }
-  return '0.0.0.0';
+  $ra = $_SERVER['REMOTE_ADDR'] ?? '';
+  return filter_var($ra, FILTER_VALIDATE_IP) ? $ra : '0.0.0.0';
 }
 
 function infouno_rate_dir() {
@@ -42,7 +45,7 @@ function infouno_rate_check($cfg) {
   $dir = infouno_rate_dir();
 
   // --- Capa 1: por IP (ventana deslizante de timestamps) ---
-  $ip = infouno_client_ip();
+  $ip = infouno_client_ip(!empty($cfg['trust_forwarded']));
   $ipFile = $dir . '/ip_' . md5($ip) . '.json';
   $fh = @fopen($ipFile, 'c+');
   if ($fh) {

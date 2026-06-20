@@ -40,6 +40,9 @@ return [
   'rate_per_min'      => 15,     // máx. requests por IP por minuto
   'rate_per_hour'     => 60,     // máx. requests por IP por hora
   'rate_daily_global' => 1500,   // techo total de llamadas al LLM por día (salvavidas del presupuesto)
+  // false (default seguro): usa REMOTE_ADDR. Poné true SOLO si estás detrás de un proxy de
+  // confianza que setea X-Forwarded-For (ej. Cloudflare); si no, sería spoofeable.
+  'trust_forwarded'   => false,
 
   // --- Alerta de lead VIP por WhatsApp (vía Make) ---
   // URL del webhook del escenario de Make. Vacío = alerta VIP desactivada (no cambia nada).
