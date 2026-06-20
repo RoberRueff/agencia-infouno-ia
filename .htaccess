@@ -1,0 +1,24 @@
+# Infouno — Headers de seguridad (M3 de la auditoría: ai/security-audit.md)
+# Requiere mod_headers (Apache/LiteSpeed). Si el server frontal es nginx/openresty
+# puro y los ignora, verificar con `curl -I https://infouno.com.ar/` y, si no aparecen,
+# setearlos a nivel proxy o vía header() en los .php dinámicos.
+
+<IfModule mod_headers.c>
+  # Anti-clickjacking
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Evita MIME-sniffing
+  Header always set X-Content-Type-Options "nosniff"
+  # Privacidad del referer
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # El sitio no usa geolocalización
+  Header always set Permissions-Policy "geolocation=()"
+  # Fuerza HTTPS en visitas futuras (confirmar antes que http -> https 301 funciona)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # CSP en modo REPORT-ONLY: no bloquea, solo reporta, para ajustar sin romper
+  # (GA4, Google Fonts, agendador Cal.com/Calendly). Pasar a enforce cuando esté limpio.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://cal.com https://*.cal.com https://calendly.com https://*.calendly.com; base-uri 'self'; form-action 'self'"
+</IfModule>
+
+# Suprime el listado de directorios (defensa en profundidad)
+Options -Indexes

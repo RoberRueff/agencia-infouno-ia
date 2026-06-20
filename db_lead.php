@@ -8,6 +8,7 @@ if (!function_exists('s')) {
   function s($v, $max = 190) {
     $v = is_string($v) ? trim($v) : '';
     $v = strip_tags($v);
+    $v = preg_replace('/[\r\n]+/', ' ', $v);   // anti header-injection (email) + normaliza saltos
     if (mb_strlen($v) > $max) $v = mb_substr($v, 0, $max);
     return $v;
   }
