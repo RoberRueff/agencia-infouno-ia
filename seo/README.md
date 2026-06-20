@@ -8,6 +8,7 @@ Centro de documentación y seguimiento del trabajo SEO. **Solo documentación**:
 
 | Archivo | Contenido |
 |---|---|
+| [SEO.md](SEO.md) | **Auditoría y estrategia maestra** (diagnóstico, E-E-A-T, roadmap priorizado, KPIs). Empezar acá. |
 | [keyword-map.md](keyword-map.md) | Investigación de palabras clave por pilar e intención. |
 | [log.md](log.md) | Bitácora de lo implementado (por sprint) y lo pendiente. |
 | [checklist.md](checklist.md) | Acciones manuales fuera del código (Search Console, GBP, OG, etc.). |
