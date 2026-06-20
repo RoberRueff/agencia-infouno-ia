@@ -53,10 +53,14 @@ conversación, no limita la cantidad de requests → un atacante puede quemar el
 - **Fix aplicado:** `s()` ahora hace `preg_replace('/[\r\n]+/', ' ', $v)`. Cierra el vector de
   raíz (s() se usa para todos los campos).
 
-**M2 — Sin anti-automatización en `lead.php` → spam de leads / contaminación de DB.** `PENDIENTE`
+**M2 — Sin anti-automatización en `lead.php` → spam de leads / contaminación de DB.** ✅ `RESUELTO (en código)`
 Endpoint abierto, sin captcha/honeypot/rate-limit.
-- **Remediación:** honeypot oculto + check de tiempo mínimo de submit + rate-limit por IP.
-  Opcional: Cloudflare Turnstile / hCaptcha.
+- **Fix aplicado:** **honeypot** (campo trampa `website` oculto en el form; `lead.php` descarta
+  silenciosamente si viene completo) + **rate-limit** por IP en `lead.php` (bucket `lead`,
+  30/min · 200/hora · 5000/día — generoso para no romper el flujo del bot scripteado).
+- **Residual / opcional:** Cloudflare Turnstile / hCaptcha para bots avanzados que ignoran el
+  honeypot. El honeypot tiene fallback seguro: aunque un falso positivo descarte el guardado,
+  el form igual abre WhatsApp, así que el contacto no se pierde.
 
 **M3 — Faltan headers de seguridad.** ✅ `RESUELTO (df857dc)` (verificar en server)
 No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
@@ -89,7 +93,7 @@ No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
 | 1 | M1 — fix `s()` anti email-injection | ✅ hecho (`df857dc`) |
 | 2 | M3 — headers de seguridad (`.htaccess`) | ✅ hecho (`df857dc`), **verificar en server** |
 | 3 | H1 — rate-limit en `chat.php` | ✅ hecho + **verificado en prod (429 OK)**. Falta: tope de gasto del proveedor (operativo) |
-| 4 | M2 — honeypot + Turnstile en el form | ⏳ pendiente |
+| 4 | M2 — honeypot + rate-limit en `lead.php` | ✅ hecho (código); Turnstile opcional |
 | 5 | L4 — SPF/DKIM/DMARC del dominio | ⏳ pendiente (DNS) |
 | 6 | L2/L3 — server_tokens off + forzar HTTPS/HSTS | ⏳ pendiente |
 

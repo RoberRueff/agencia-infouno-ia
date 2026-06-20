@@ -74,6 +74,8 @@
       <form id="contact-form">
         <div class="field"><label for="nombre">Nombre</label><input id="nombre" name="nombre" type="text" placeholder="Tu nombre" required></div>
         <div class="field"><label for="empresa">Empresa o negocio</label><input id="empresa" name="empresa" type="text" placeholder="Nombre de tu empresa"></div>
+        <!-- Honeypot anti-spam: oculto para humanos; si viene completo, es un bot (lead.php lo descarta) -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden"><label for="website">No completar este campo</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
         <div class="field"><label for="interes">¿Qué te interesa?</label>
           <select id="interes" name="interes">
             <option>Diagnóstico gratuito</option>

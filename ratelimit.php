@@ -37,16 +37,17 @@ function infouno_rate_dir() {
  * Capas: por IP (req/min y req/hora, ventana deslizante) + tope global diario.
  * Umbrales configurables en config.php (defaults: 15/min, 60/hora, 1500/día).
  */
-function infouno_rate_check($cfg) {
-  $perMin  = (int) ($cfg['rate_per_min']      ?? 15);
-  $perHour = (int) ($cfg['rate_per_hour']     ?? 60);
-  $perDayG = (int) ($cfg['rate_daily_global'] ?? 1500);
+function infouno_rate_check($cfg, $opts = []) {
+  $bucket  = $opts['bucket'] ?? 'chat';   // separa contadores por endpoint (chat / lead)
+  $perMin  = (int) ($opts['per_min']        ?? $cfg['rate_per_min']      ?? 15);
+  $perHour = (int) ($opts['per_hour']       ?? $cfg['rate_per_hour']     ?? 60);
+  $perDayG = (int) ($opts['per_day_global'] ?? $cfg['rate_daily_global'] ?? 1500);
   $now = time();
   $dir = infouno_rate_dir();
 
   // --- Capa 1: por IP (ventana deslizante de timestamps) ---
   $ip = infouno_client_ip(!empty($cfg['trust_forwarded']));
-  $ipFile = $dir . '/ip_' . md5($ip) . '.json';
+  $ipFile = $dir . '/' . $bucket . '_ip_' . md5($ip) . '.json';
   $fh = @fopen($ipFile, 'c+');
   if ($fh) {
     @flock($fh, LOCK_EX);
@@ -65,7 +66,7 @@ function infouno_rate_check($cfg) {
   }
 
   // --- Capa 2: tope global diario (salvavidas del presupuesto ante rotación de IP) ---
-  $gFile = $dir . '/global_' . gmdate('Y-m-d', $now) . '.txt';
+  $gFile = $dir . '/' . $bucket . '_global_' . gmdate('Y-m-d', $now) . '.txt';
   $gh = @fopen($gFile, 'c+');
   if ($gh) {
     @flock($gh, LOCK_EX);

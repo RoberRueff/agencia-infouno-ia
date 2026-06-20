@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const d = new FormData(form);
-      postLead({ source: 'form', name: d.get('nombre') || '', empresa: d.get('empresa') || '', interes: d.get('interes') || '', mensaje: d.get('mensaje') || '' });
+      postLead({ source: 'form', name: d.get('nombre') || '', empresa: d.get('empresa') || '', interes: d.get('interes') || '', mensaje: d.get('mensaje') || '', hp: d.get('website') || '' });
       window.infoTrack('generate_lead', { method: 'form', interes: d.get('interes') || '' });
       const msg = `Hola Infouno 👋\n\nNombre: ${d.get('nombre') || ''}\nEmpresa: ${d.get('empresa') || ''}\nInterés: ${d.get('interes') || ''}\n\n${d.get('mensaje') || ''}`;
       window.open(waLink(msg), '_blank', 'noopener');
