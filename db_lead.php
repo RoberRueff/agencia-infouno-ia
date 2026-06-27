@@ -78,6 +78,7 @@ function infouno_save_lead($cfg, $in) {
   // ¿Ya existe? (para no notificar dos veces: email y WhatsApp por separado)
   $notified = 0; $vipNotified = 0;
   $q = $db->prepare('SELECT lead_notified, lead_vip_notified FROM wp_infouno_leads WHERE session_id = ? LIMIT 1');
+  if (!$q) { $db->close(); return ['ok' => false, 'error' => 'db']; }
   $q->bind_param('s', $session);
   $q->execute();
   if ($r = $q->get_result()->fetch_assoc()) { $notified = (int) $r['lead_notified']; $vipNotified = (int) $r['lead_vip_notified']; }
@@ -111,6 +112,7 @@ function infouno_save_lead($cfg, $in) {
      lead_vip            = GREATEST(lead_vip, VALUES(lead_vip))';
 
   $stmt = $db->prepare($sql);
+  if (!$stmt) { $db->close(); return ['ok' => false, 'error' => 'db']; }
   $stmt->bind_param(
     'ssssssssssssssii',
     $session, $vName, $vRubro, $vCompany, $vMessage, $infra, $size, $vPhone, $vEmail,
@@ -119,8 +121,11 @@ function infouno_save_lead($cfg, $in) {
   $ok = $stmt->execute();
   $stmt->close();
 
-  // Notificación por email (una sola vez)
-  $actionable = ($phoneValid || $emailValid || $source === 'form');
+  // Notificación por email (una sola vez). Solo cuando el lead tiene sustancia:
+  // contacto válido + identidad (nombre o rubro), para no avisar en pasos parciales
+  // del bot. El form siempre notifica (coordina por WhatsApp, sin tel/email guardado).
+  $hasIdentity = ($name !== '' || $rubro !== '');
+  $actionable = ($source === 'form') || (($phoneValid || $emailValid) && $hasIdentity);
   if ($ok && $actionable && !$notified) {
     $subject = ($vip ? '[LEAD VIP] ' : '[Lead] ') . ($name !== '' ? $name : 'Nuevo contacto') . ($rubro !== '' ? ' — ' . $rubro : '');
     $body = implode("\n", [
@@ -139,10 +144,11 @@ function infouno_save_lead($cfg, $in) {
     $headers = 'From: ' . $cfg['from_email'] . "\r\n" . 'Content-Type: text/plain; charset=utf-8';
     @mail($cfg['notify_email'], $subject, $body, $headers);
 
-    $u = $db->prepare('UPDATE wp_infouno_leads SET lead_notified = 1 WHERE session_id = ?');
-    $u->bind_param('s', $session);
-    $u->execute();
-    $u->close();
+    if ($u = $db->prepare('UPDATE wp_infouno_leads SET lead_notified = 1 WHERE session_id = ?')) {
+      $u->bind_param('s', $session);
+      $u->execute();
+      $u->close();
+    }
   }
 
   // Alerta de lead VIP por WhatsApp (vía Make). Best-effort, NO bloqueante: nunca
@@ -179,10 +185,11 @@ function infouno_save_lead($cfg, $in) {
     if ($resp === false) @error_log('infouno: webhook Make fallo — ' . $cerr);
 
     // Marca best-effort (al intentar): evita re-disparar en cada paso del bot.
-    $uv = $db->prepare('UPDATE wp_infouno_leads SET lead_vip_notified = 1 WHERE session_id = ?');
-    $uv->bind_param('s', $session);
-    $uv->execute();
-    $uv->close();
+    if ($uv = $db->prepare('UPDATE wp_infouno_leads SET lead_vip_notified = 1 WHERE session_id = ?')) {
+      $uv->bind_param('s', $session);
+      $uv->execute();
+      $uv->close();
+    }
   }
 
   $db->close();
