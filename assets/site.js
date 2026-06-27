@@ -167,7 +167,9 @@ function initCalc() {
     const roi = ahorro > 0 ? Math.max(0, ((ahorro - costoAuto) / costoAuto * 100)) : 0;
     document.querySelector('#r-horas').textContent = Math.round(horasMes) + ' hs';
     document.querySelector('#r-ahorro').textContent = peso(ahorro);
-    document.querySelector('#r-roi').textContent = (ahorro <= costoAuto ? '+' + Math.round(ahorro / costoAuto * 100) : '+' + Math.round(roi)) + '%';
+    // ROI real: (ahorro − inversión) / inversión. `roi` ya viene clampeado a 0, así que
+    // mostramos "+X%" solo cuando el ahorro supera la inversión; si no, "0%" (sin "+" engañoso).
+    document.querySelector('#r-roi').textContent = (roi > 0 ? '+' : '') + Math.round(roi) + '%';
     [wa, stock, cost].forEach(paint);
   }
   [wa, stock, cost].forEach(el => el.addEventListener('input', calc));
