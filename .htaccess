@@ -9,3 +9,9 @@
 </IfModule>
 
 Options -Indexes
+
+# Bloquear acceso directo a config y archivos sensibles (defense-in-depth).
+# config.php es PHP (no filtra fuente), pero negamos el acceso por las dudas.
+<FilesMatch "^(config\.php|config\.sample\.php)$">
+  Require all denied
+</FilesMatch>
