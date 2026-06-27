@@ -463,6 +463,10 @@
 </head>
 <body>
 
+<!-- Honeypot anti-spam: invisible para humanos, los bots lo rellenan -->
+<input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"
+       style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+
 <!-- Glows decorativos de fondo -->
 <div class="glow glow--a"></div>
 <div class="glow glow--b"></div>
@@ -770,8 +774,16 @@ function checked(name) {
 }
 function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
+function leadSid() {
+  let s = sessionStorage.getItem('metodoSid');
+  if (!s) { s = 'metodo-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); sessionStorage.setItem('metodoSid', s); }
+  return s;
+}
+
 function collect() {
   return {
+    session_id: leadSid(),
+    hp: val('hp-website'),               // honeypot anti-spam (debe quedar vacío)
     empresa: val('empresa'), contacto: val('contacto'), cargo: val('cargo'),
     telefono: val('telefono'), email: val('email'), sitio: val('sitio'), redes: val('redes'),
     rubro: val('rubro'),
@@ -801,7 +813,7 @@ async function submitForm() {
     <div class="glow glow--b"></div>`;
 
   try {
-    const res  = await fetch('/api/diagnostico', {
+    const res  = await fetch('diagnostico.php', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
