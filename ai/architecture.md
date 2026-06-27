@@ -2,9 +2,9 @@
 
 La arquitectura sigue un enfoque **desacoplado e híbrido** (*Hybrid AI-First Architecture*). Aprovecha la madurez y el rendimiento para indexación SEO de WordPress junto con el procesamiento cognitivo de modelos LLM.
 
-> ⚠️ **Estado actual vs objetivo:** este documento describe la **arquitectura objetivo (target)**. El repositorio implementa hoy un **frontend HTML estático** (7 páginas + `assets/site.js`) con una **capa backend en PHP** (DonWeb/cPanel): persistencia en MySQL (`wp_infouno_leads`) y capa cognitiva OpenAI vía `chat.php`. Lo que falta del objetivo es **WordPress/Elementor** y la **orquestación** (Make/Node.js). Ver la brecha completa y el roadmap en [`ai/analysis.md`](analysis.md).
+> ⚠️ **Estado actual vs objetivo:** este documento describe la **arquitectura objetivo (target)**. El repositorio implementa hoy un **frontend HTML estático** (8 páginas + `assets/site.js`) con una **capa backend en PHP** (DonWeb/cPanel): persistencia en MySQL (`wp_infouno_leads`) y capa cognitiva (LLM compatible con OpenAI — OpenAI/Gemini según `api_base`) vía `chat.php`. Lo que falta del objetivo es **WordPress/Elementor** y la **orquestación** (Make/Node.js). Ver la brecha completa y el roadmap en [`ai/analysis.md`](analysis.md).
 >
-> **Actualización (capa cognitiva):** el bot "Uno" ya tiene modo IA real vía `chat.php` (OpenAI `gpt-4o-mini`, T=0.3) con function calling para captar leads, y degrada al guion scripteado si la IA no está disponible. La clave vive en `config.php` (backend).
+> **Actualización (capa cognitiva):** el bot "Uno" ya tiene modo IA real vía `chat.php` con function calling para captar leads, y degrada al guion scripteado si la IA no está disponible. Usa la API Chat Completions **compatible con OpenAI**; el proveedor se elige con `api_base` en `config.php`: OpenAI (`gpt-4o-mini`) o Gemini (`gemini-2.5-flash`), T=0.3. La clave vive en `config.php` (backend).
 
 ## Diagrama de Capas
 

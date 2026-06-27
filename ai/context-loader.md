@@ -14,7 +14,7 @@
 
 > **IMPORTANTE — leer primero `ai/analysis.md`.** Hay una brecha grande entre la arquitectura objetivo y el estado real.
 
-**Estado actual (lo que hay en el repo):** sitio **HTML estático** (7 páginas) + `assets/styles.css` + `assets/site.js`, **más una capa backend en PHP** sobre DonWeb/cPanel. El frontend (calculadora ROI, bot "Uno", formulario, agenda) vive en `site.js`. El bot "Uno" corre en **dos modos**: IA real vía `chat.php` (OpenAI `gpt-4o-mini`, T=0.3, con *function calling*) y, si la IA no está disponible, degrada al **guion scripteado**. Los leads se **persisten paso a paso** en MySQL (`wp_infouno_leads`) vía `lead.php`/`db_lead.php`, con scoring/VIP y aviso por email; el cierre ofrece agenda embebida y/o WhatsApp. **Todavía NO hay** WordPress/Elementor ni orquestación (Make/Node.js): esas dos capas siguen siendo objetivo.
+**Estado actual (lo que hay en el repo):** sitio **HTML estático** (8 páginas) + `assets/styles.css` + `assets/site.js`, **más una capa backend en PHP** sobre DonWeb/cPanel. El frontend (calculadora ROI, bot "Uno", formulario, agenda) vive en `site.js`. El bot "Uno" corre en **dos modos**: IA real vía `chat.php` (LLM compatible con OpenAI — OpenAI `gpt-4o-mini` o Gemini `gemini-2.5-flash` según `api_base`, T=0.3, con *function calling*) y, si la IA no está disponible, degrada al **guion scripteado**. Los leads se **persisten paso a paso** en MySQL (`wp_infouno_leads`) vía `lead.php`/`db_lead.php`, con scoring/VIP y aviso por email; el cierre ofrece agenda embebida y/o WhatsApp. **Todavía NO hay** WordPress/Elementor ni orquestación (Make/Node.js): esas dos capas siguen siendo objetivo.
 
 **Arquitectura objetivo (`ai/architecture.md`):**
 
@@ -36,13 +36,17 @@
 | `casos.html` | Casos de éxito. |
 | `contacto.html` | Formulario / conversión. |
 | `assets/site.js` | **Toda la lógica frontend**: WhatsApp, calculadora ROI, bot "Uno" (modo IA + guion), agenda embebida, panel Tweaks, persistencia de leads (`postLead`). |
-| `chat.php` | Proxy del bot "Uno" a OpenAI (`gpt-4o-mini`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y fallback al guion. La API key vive solo aquí (vía `config.php`). |
+| `chat.php` | Proxy del bot "Uno" al LLM vía API compatible con OpenAI (OpenAI `gpt-4o-mini` / Gemini `gemini-2.5-flash` según `api_base`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y fallback al guion. La API key vive solo aquí (vía `config.php`). |
 | `lead.php` | Receptor de leads (formulario + bot scripteado). Delega la persistencia en `db_lead.php`. |
 | `db_lead.php` | Persistencia compartida (`lead.php` + `chat.php`): sanitización, validación tel/email, mapeo a taxonomía, scoring/VIP (R3), upsert por `session_id` (R4) y email. |
+| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`, `lead.php` y `diagnostico.php`; anti-spam de leads (honeypot + throttling). Ver `ai/security-audit.md` (H1/M2). |
+| `metodo-uno/public/metodo-uno-nivel1.html` | Landing del **Método UNO® — Diagnóstico Nivel 1**: wizard de 4 pasos (JS inline). Postea a `diagnostico.php`. Enlazada desde el nav/CTA del home. |
+| `metodo-uno/public/diagnostico.php` | Endpoint del diagnóstico: valida + honeypot + rate-limit, **persiste el lead** (`db_lead.php`, `source=metodo-uno`) y proxea al LLM reusando `config.php`. PHP, sin Node. |
 | `config.php` | Credenciales de MySQL, OpenAI y emails (completar en el server; **no se versiona**). |
+| `privacidad.html` | Política de privacidad (Ley 25.326). Enlazada desde el footer de todas las páginas. |
 | `config.sample.php` | Plantilla versionada de `config.php`, sin credenciales. |
 | `robots.txt` | Reglas de rastreo (bloquea backend/internos) + referencia al `sitemap.xml`. |
-| `sitemap.xml` | Mapa de las 7 URLs públicas para Google Search Console. |
+| `sitemap.xml` | Mapa de las 9 URLs públicas (8 páginas + landing Método UNO) para Google Search Console. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento del bot "Uno" (se inyecta en el system prompt de `chat.php`). |
 | `db/schema.sql` | DDL de la tabla `wp_infouno_leads` (pegar en phpMyAdmin). |
 | `assets/styles.css` | Estilos (temas dark/light, acentos, tipografías). |

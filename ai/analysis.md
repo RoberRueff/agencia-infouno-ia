@@ -6,7 +6,7 @@
 
 ## 1. Resumen Ejecutivo
 
-El repositorio es un **sitio HTML estático** (7 páginas + `assets/`) con una **capa backend en PHP** sobre DonWeb/cPanel — todavía **no** la plataforma WordPress + Elementor que describen los documentos de arquitectura. Sobre ese MVP ya se sumaron las tres piezas que faltaban: **persistencia** (MySQL `wp_infouno_leads` vía `lead.php`/`db_lead.php`, paso a paso), **capa cognitiva** (bot "Uno" con OpenAI `gpt-4o-mini` vía `chat.php`, con fallback al guion scripteado) y **agenda** (agendador embebido). La conversión ofrece agenda y/o WhatsApp. Siguen pendientes **WordPress/Elementor** y la **orquestación** (Make/Node.js).
+El repositorio es un **sitio HTML estático** (8 páginas + `assets/`) con una **capa backend en PHP** sobre DonWeb/cPanel — todavía **no** la plataforma WordPress + Elementor que describen los documentos de arquitectura. Sobre ese MVP ya se sumaron las tres piezas que faltaban: **persistencia** (MySQL `wp_infouno_leads` vía `lead.php`/`db_lead.php`, paso a paso), **capa cognitiva** (bot "Uno" con LLM compatible con OpenAI vía `chat.php` — OpenAI `gpt-4o-mini` o Gemini `gemini-2.5-flash` según `api_base`, con fallback al guion scripteado) y **agenda** (agendador embebido). La conversión ofrece agenda y/o WhatsApp. Siguen pendientes **WordPress/Elementor** y la **orquestación** (Make/Node.js).
 
 Los documentos `architecture.md`, `taxonomy.md`, `rules.md`, `guardrails.md` y `checks.md` describen la **visión objetivo** (target). Este archivo marca la brecha restante y el camino.
 
@@ -24,13 +24,14 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 ├── nosotros.html           Nosotros
 ├── contacto.html           Formulario de contacto → WhatsApp + lead.php
 ├── privacidad.html         Política de privacidad (Ley 25.326)
-├── chat.php                Proxy del bot "Uno" a OpenAI (function calling, fallback al guion)
+├── chat.php                Proxy del bot "Uno" al LLM compatible con OpenAI (OpenAI/Gemini según api_base; function calling, fallback al guion)
 ├── lead.php                Receptor de leads (formulario + bot) → delega en db_lead.php
 ├── db_lead.php             Persistencia compartida: sanitización + validación + scoring/VIP + upsert + email
+├── ratelimit.php           Rate-limit anti-abuso (file-based) para chat.php/lead.php + anti-spam (honeypot)
 ├── config.php              Credenciales MySQL + OpenAI + emails (NO se versiona)
 ├── config.sample.php       Plantilla versionada de config.php (sin credenciales)
 ├── robots.txt              Reglas de rastreo + referencia al sitemap (SEO)
-├── sitemap.xml             Mapa de las 7 URLs públicas para Search Console (SEO)
+├── sitemap.xml             Mapa de las 9 URLs públicas (8 páginas + landing Método UNO) para Search Console (SEO)
 ├── assets/
 │   ├── site.js             TODA la lógica frontend: WhatsApp, calculadora, bot "Uno", agenda, leads, Tweaks
 │   ├── styles.css          Estilos (temas dark/light, acentos, tipografías)
@@ -39,6 +40,8 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 │   └── kb_infouno.md       Base de conocimiento del bot "Uno" (system prompt de chat.php)
 ├── db/
 │   └── schema.sql          DDL de la tabla wp_infouno_leads
+├── metodo-uno/             Método UNO® — Diagnóstico Nivel 1 (wizard + diagnostico.php; PHP, sin Node)
+│   └── public/             metodo-uno-nivel1.html (form) + diagnostico.php (LLM + persiste lead)
 ├── ai/                     Documentación (análisis, arquitectura, taxonomía, reglas, guardrails, checks)
 └── sin-publicar/           Material NO publicado (no enlazado por el sitio)
     ├── Infouno - Sitio Web.html  Export single-file viejo (sin bot/calc activos)
@@ -64,7 +67,7 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 | **Panel "Tweaks"** | Tema dark/light, color de acento, tipografía. Persiste en `localStorage`, integra `postMessage` con editor visual. | ✅ Implementado |
 | **Animaciones reveal / nav móvil** | IntersectionObserver + toggle de menú. | ✅ Implementado |
 
-**El bot "Uno" tiene dos modos.** Si `chat.php` está habilitado (hay `openai_key` y `chat_enabled`), corre en **modo IA** (OpenAI `gpt-4o-mini`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y la base de conocimiento de `ai-kb/kb_infouno.md` inyectada en el system prompt; si no, degrada al **guion scripteado** (plantilla fija por pasos). Defensas: `escapeHtml()` en el frontend (XSS del widget) y, en backend, *prepared statements* (mysqli) + sanitización en `db_lead.php`. Aún **no hay RAG**: la KB se inyecta entera, sin recuperación selectiva.
+**El bot "Uno" tiene dos modos.** Si `chat.php` está habilitado (hay `openai_key` y `chat_enabled`), corre en **modo IA** (LLM compatible con OpenAI — OpenAI `gpt-4o-mini` o Gemini `gemini-2.5-flash` según `api_base`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y la base de conocimiento de `ai-kb/kb_infouno.md` inyectada en el system prompt; si no, degrada al **guion scripteado** (plantilla fija por pasos). Defensas: `escapeHtml()` en el frontend (XSS del widget) y, en backend, *prepared statements* (mysqli) + sanitización en `db_lead.php`. Aún **no hay RAG**: la KB se inyecta entera, sin recuperación selectiva.
 
 ---
 
@@ -73,18 +76,18 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 | Área | Objetivo documentado | Estado real | Brecha |
 |---|---|---|---|
 | **Frontend** | WordPress v6+ + Elementor (SSR, Core Web Vitals) | HTML estático servido tal cual | Migrar a WP o asumir estático como definitivo |
-| **Motor IA** | OpenAI GPT-4o, T=0.3, RAG | Agente conversacional con `gpt-4o-mini` (T=0.3) vía `chat.php`, con fallback al guion | ✅ Implementado (KB en archivo, sin RAG por ahora) |
-| **Persistencia** | MySQL `wp_infouno_leads` | Ninguna; lead va por WhatsApp | No se almacena ni puntúa nada |
+| **Motor IA** | OpenAI GPT-4o, T=0.3, RAG | Agente conversacional vía `chat.php` (API compatible con OpenAI: OpenAI `gpt-4o-mini` o Gemini `gemini-2.5-flash` según `api_base`, T=0.3), con fallback al guion | ✅ Implementado (KB en archivo, sin RAG por ahora) |
+| **Persistencia** | MySQL `wp_infouno_leads` | MySQL `wp_infouno_leads` vía `lead.php`/`db_lead.php` (upsert por `session_id`, scoring/VIP, email) | ✅ Implementado (falta solo MySQL nativo de WP) |
 | **Orquestación** | Make / Node.js + webhooks HTTPS | Ninguna | Sin middleware |
 | **Taxonomía URLs** | Silos `/soluciones/…`, `/casos-exito/…` | Archivos planos `.html` | URLs no coinciden con el plan SEO |
-| **R1 Activación** | 5s inactividad **o** exit-intent | Solo 5s (timer) | Falta exit-intent |
+| **R1 Activación** | 5s inactividad **o** exit-intent | 5s (timer) + exit-intent | ✅ Cumplido |
 | **R2 Captura temprana** | Nombre + rubro antes de soluciones | Bot pide rubro → nombre → recién ahí el ejemplo | ✅ Cumplido |
 | **R3 Lead scoring VIP** | Clasifica y alerta por webhook | Bot capta 3 tramos de equipo; `lead.php` marca VIP (equipo +5 + web) + email | ✅ Cumplido (alerta vía email) |
-| **R4 Persistencia asíncrona** | Guardado paso a paso (Fetch) | No existe; solo al final por WhatsApp | Sin recuperación de leads fríos |
-| **G1 Scope/tono** | Fallback anti "ChatGPT gratis" | No aplica (no hay LLM) | Relevante solo al integrar IA |
+| **R4 Persistencia asíncrona** | Guardado paso a paso (Fetch) | `fetch('/lead.php')` paso a paso con `keepalive` (upsert por `session_id`) | ✅ Cumplido (recupera leads fríos) |
+| **G1 Scope/tono** | Fallback anti "ChatGPT gratis" | Modo IA (`gpt-4o-mini`) con system prompt acotado a Infouno + fallback al guion | ✅ Cubierto (ver `guardrails.md`) |
 | **G2 No precios** | Bot nunca da precios | El bot no habla de precios | ✅ Cumplido por diseño |
-| **G3 MySQL/XSS guard** | Sanitización backend SQLi/XSS | Solo `escapeHtml` en frontend | Falta backend; sin SQL no hay SQLi hoy |
-| **G4 Ley 25.326** | T&C visibles, datos de uso exclusivo | No verificado en las páginas | Revisar T&C / aviso de privacidad |
+| **G3 MySQL/XSS guard** | Sanitización backend SQLi/XSS | Prepared statements (`mysqli`) + sanitización en `db_lead.php`; `escapeHtml`/`textContent` en frontend | ✅ Cubierto (ver `security-audit.md`) |
+| **G4 Ley 25.326** | T&C visibles, datos de uso exclusivo | `privacidad.html` + consentimiento en bot/form + Consent Mode v2/GA4 opt-in + link en footer | ✅ Cumplido |
 | **Checks (tel/email/agenda/UTM)** | Validaciones en tiempo real + Google Calendar | tel/email/UTM en `lead.php`+`site.js`; agenda vía agendador embebido | ✅ Cubiertos (agenda con widget, no API a medida) |
 
 ---
@@ -95,7 +98,7 @@ agencia-infouno-ia/                 (raíz = solo lo que se publica/opera)
 2. **Trazabilidad:** ✅ mitigado. Se capturan UTM en `sessionStorage` y se guardan junto al lead (Check de Trazabilidad SEO).
 3. **Validación de datos:** ✅ mitigado en backend. `db_lead.php` normaliza el teléfono (AR) y valida el email (formato + bloqueo de desechables) antes de persistir.
 4. **Coherencia de marketing:** parcialmente vigente. El copy menciona "WordPress + MySQL", pero el frontend es HTML estático (sí hay IA real en el bot y MySQL en el backend). Alinear el discurso con el entregable para no sobreprometer la parte de WordPress.
-5. **Dependencia de OpenAI / costo:** nuevo riesgo. El modo IA depende de la API de OpenAI; `chat.php` topea turnos (16) y `max_tokens` para acotar costo y degrada al guion si la API falla. Conviene monitorear gasto y errores 5xx.
+5. **Dependencia del proveedor LLM / costo:** nuevo riesgo. El modo IA depende de una API externa (OpenAI o Gemini según `api_base`); `chat.php` topea turnos (16) y `max_tokens` para acotar costo y degrada al guion si la API falla. Conviene monitorear gasto y errores 5xx.
 6. **Privacidad (Ley 25.326):** ✅ cubierto. `privacidad.html`, nota de consentimiento en el bot y bajo el formulario, y link "Privacidad" en el footer de todas las páginas.
 
 ---

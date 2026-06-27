@@ -1,9 +1,10 @@
 <?php
 /* =====================================================================
-   Infouno — Agente conversacional "Uno" (proxy a OpenAI)
+   Infouno — Agente conversacional "Uno" (proxy a un LLM compatible con OpenAI)
    GET  = ping de disponibilidad  → {ok, enabled}
    POST = turno de conversación   → {ok, reply, readyToClose, leadFields}
-   La clave de OpenAI vive solo acá (config.php). Persiste vía db_lead.php.
+   Proveedor configurable por 'api_base' (OpenAI / Gemini OpenAI-compatible).
+   La API key vive solo acá (config.php). Persiste vía db_lead.php.
    ===================================================================== */
 
 header('Content-Type: application/json; charset=utf-8');

@@ -7,7 +7,7 @@
 ## 0. Preámbulo
 
 - **Proyecto:** Infouno — Agencia IA (sitio web + chatbot conversacional con IA).
-- **Stack actual:** HTML estático (7 páginas) + `assets/site.js` · PHP sobre DonWeb/cPanel (`chat.php`, `lead.php`, `db_lead.php`) · OpenAI API (`gpt-4o-mini`, T=0.3) con fallback al guion · MySQL (`wp_infouno_leads`).
+- **Stack actual:** HTML estático (8 páginas) + `assets/site.js` · PHP sobre DonWeb/cPanel (`chat.php`, `lead.php`, `db_lead.php`) · LLM vía API compatible con OpenAI, proveedor configurable por `api_base` (OpenAI `gpt-4o-mini` / Gemini `gemini-2.5-flash`, T=0.3) con fallback al guion · MySQL (`wp_infouno_leads`).
 - **Stack objetivo (pendiente):** WordPress (Core v6+) + Elementor · orquestación Make/Node.js.
 - **Idioma de trabajo:** Español.
 - **Referencia de arquitectura:** ver `ai/architecture.md`.
@@ -47,7 +47,7 @@
 
 1. **Evidencia antes que afirmaciones.** No declarar "funciona" sin haberlo verificado.
 2. **SEO y rendimiento primero.** Toda inyección de scripts es asíncrona y no bloqueante.
-3. **Seguridad.** Webhooks siempre por HTTPS POST; nunca exponer claves de OpenAI ni credenciales de MySQL en el frontend.
+3. **Seguridad.** Webhooks siempre por HTTPS POST; nunca exponer claves del LLM (OpenAI/Gemini) ni credenciales de MySQL en el frontend.
 4. **Trazabilidad.** Toda interacción relevante del lead se persiste en `wp_infouno_leads`.
 5. **Cambios reversibles.** Antes de borrar o sobrescribir, revisar el destino.
 

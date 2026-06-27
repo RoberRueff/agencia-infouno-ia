@@ -18,7 +18,7 @@ Sitio corporativo + chatbot "Uno" para **captar y cualificar leads** de PyMEs ar
 
 ## Stack
 
-- **Actual:** HTML estático (8 páginas) + `assets/site.js` · backend PHP en DonWeb/cPanel (`chat.php`, `lead.php`, `db_lead.php`) · OpenAI API (`gpt-4o-mini`, T=0.3) con fallback al guion · MySQL (`wp_infouno_leads`). Sin build system ni gestor de paquetes.
+- **Actual:** HTML estático (8 páginas) + `assets/site.js` · backend PHP en DonWeb/cPanel (`chat.php`, `lead.php`, `db_lead.php`) · LLM vía API compatible con OpenAI, proveedor configurable por `api_base` (OpenAI `gpt-4o-mini` / Gemini `gemini-2.5-flash`, T=0.3) con fallback al guion · MySQL (`wp_infouno_leads`). Sin build system ni gestor de paquetes.
 - **Objetivo (pendiente):** WordPress (Core v6+) + Elementor · orquestación Make/Node.js. Ver `ai/architecture.md` y el roadmap en `ai/analysis.md`.
 
 ## Mapa rápido
@@ -27,8 +27,10 @@ Sitio corporativo + chatbot "Uno" para **captar y cualificar leads** de PyMEs ar
 |---|---|
 | `*.html` (raíz) | 8 páginas públicas. El bot vive solo en `index.html`; la calculadora ROI, en `index.html` y `calculadora-roi.html`. |
 | `assets/site.js` | Toda la lógica frontend: WhatsApp, calculadora ROI, bot "Uno" (IA + guion), agenda, leads, Tweaks. |
-| `chat.php` | Proxy del bot a OpenAI (function calling + fallback). La API key vive solo aquí (vía `config.php`). |
+| `chat.php` | Proxy del bot al LLM vía API compatible con OpenAI (OpenAI/Gemini según `api_base`); function calling + fallback. La API key vive solo aquí (vía `config.php`). |
 | `lead.php` / `db_lead.php` | Recepción y persistencia de leads (upsert por `session_id`, scoring/VIP, email). |
+| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`/`lead.php`/`diagnostico.php`. Anti-spam de leads (honeypot + throttling). |
+| `metodo-uno/` | Landing del **Método UNO® — Diagnóstico Nivel 1** (wizard) + `public/diagnostico.php`: proxea al LLM (reusa `config.php`) y persiste el lead vía `db_lead.php` (`source=metodo-uno`). PHP, sin Node. Enlazada desde el nav/CTA del home. |
 | `config.php` | Credenciales MySQL + LLM (`api_base`/key) + emails. **No se versiona** (`.gitignore`); plantilla en `config.sample.php`. Guía de deploy en `ai/deploy-checklist.md`. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento inyectada en el system prompt de `chat.php`. |
 | `db/schema.sql` | DDL de `wp_infouno_leads`. |
@@ -47,7 +49,7 @@ No hay suite de tests automatizada: verificar el comportamiento real (bot, calcu
 ## Reglas y restricciones
 
 - **SEO y rendimiento primero:** scripts asíncronos/no bloqueantes; no penalizar LCP (< 2.5s) ni el rastreo de Google.
-- **Seguridad:** nunca claves de OpenAI ni credenciales MySQL en el frontend; backend con prepared statements y sanitización; `escapeHtml` en el chat.
+- **Seguridad:** nunca claves del LLM (OpenAI/Gemini) ni credenciales MySQL en el frontend; backend con prepared statements y sanitización; `escapeHtml` en el chat.
 - **IA:** `T = 0.3`, tono comercial directo (voseo argentino). El bot **no da precios** (G2) y solo asesora sobre Infouno (G1). Reglas completas en `ai/guardrails.md` y `ai/rules.md`.
 - **Trazabilidad:** todo lead relevante se persiste paso a paso en `wp_infouno_leads` (R4), con UTM.
 - **Privacidad:** Ley 25.326 — consentimiento visible antes de capturar datos (`privacidad.html`).
