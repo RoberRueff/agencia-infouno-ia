@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico Digital — Método UNO® · Infouno</title>
+  <meta name="description" content="Completá el diagnóstico Método UNO® y recibí una propuesta estratégica personalizada para tu empresa. Gratuito y sin compromiso.">
+  <link rel="icon" href="../../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Tokens (espejo del sitio principal) ──────────────────────────────── */
+    :root {
+      --bg:       #080B11;
+      --bg-2:     #0A0E16;
+      --panel:    #0E131D;
+      --panel-2:  #121829;
+      --panel-3:  #161D2E;
+      --line:     rgba(255,255,255,.07);
+      --line-2:   rgba(255,255,255,.12);
+      --line-3:   rgba(255,255,255,.20);
+      --ink:      #EEF2F8;
+      --text:     #A7B2C4;
+      --muted:    #6B7689;
+      --acc:      #3E9BE6;
+      --acc-2:    #62B4F2;
+      --acc-deep: #2A6FB5;
+      --acc-soft: rgba(62,155,230,.12);
+      --acc-line: rgba(62,155,230,.30);
+      --glow:     rgba(46,120,196,.40);
+      --green:    #7AB317;
+      --red:      #E4462B;
+      --wa:       #25D366;
+      --grad:     linear-gradient(135deg,#62B4F2,#2A6FB5);
+      --shadow:   0 24px 60px -20px rgba(0,0,0,.7);
+      --ff-head:  'Space Grotesk', system-ui, sans-serif;
+      --ff-body:  'Manrope', system-ui, sans-serif;
+      --r-sm: 10px; --r-md: 14px; --r-lg: 20px;
+      --maxw: 700px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--ff-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1,h2,h3,h4 { font-family: var(--ff-head); font-weight: 600; letter-spacing: -.02em; color: var(--ink); margin: 0; }
+    p { margin: 0; }
+
+    /* ── Glow decorativo ───────────────────────────────────────────────────── */
+    .glow {
+      position: fixed; border-radius: 50%;
+      filter: blur(90px); pointer-events: none; z-index: 0;
+    }
+    .glow--a { width: 520px; height: 520px; top: -180px; left: 50%;
+               transform: translateX(-20%);
+               background: radial-gradient(circle, rgba(46,120,196,.28), transparent 70%); }
+    .glow--b { width: 340px; height: 340px; bottom: 60px; right: -100px;
+               background: radial-gradient(circle, rgba(122,179,23,.14), transparent 70%); }
+
+    /* ── Header ───────────────────────────────────────────────────────────── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 60;
+      background: rgba(8,11,17,.82);
+      backdrop-filter: blur(16px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .top-bar__inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--ff-head); font-weight: 600; font-size: 1.15rem;
+      color: var(--ink); letter-spacing: -.02em; text-decoration: none;
+      white-space: nowrap;
+    }
+    .brand img { width: 28px; height: 28px; }
+    .brand b { color: var(--acc-2); }
+
+    .prog-wrap {
+      flex: 1;
+      height: 3px;
+      background: var(--line-2);
+      border-radius: 999px;
+    }
+    .prog-bar {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 999px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+    .prog-label {
+      font-family: var(--ff-head);
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Contenedor principal ─────────────────────────────────────────────── */
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Pages ────────────────────────────────────────────────────────────── */
+    .page { display: none; padding: 52px 0 80px; }
+    .page.active { display: block; animation: fadeUp .35s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Eyebrow badge ────────────────────────────────────────────────────── */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--ff-head); font-weight: 500; font-size: .78rem;
+      letter-spacing: .06em; color: var(--acc-2);
+      padding: 6px 13px;
+      border: 1px solid var(--line-2); border-radius: 999px;
+      background: rgba(62,155,230,.06);
+      margin-bottom: 20px;
+    }
+    .eyebrow::before {
+      content: ""; width: 6px; height: 6px;
+      border-radius: 999px; background: var(--acc);
+      box-shadow: 0 0 8px 1px var(--acc);
+    }
+
+    /* ── Portada (p1) ─────────────────────────────────────────────────────── */
+    .cover-title {
+      font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      margin-bottom: 16px;
+    }
+    .cover-title .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .cover-lead {
+      font-size: 1.05rem; color: var(--text);
+      line-height: 1.65; margin-bottom: 32px;
+      max-width: 580px;
+    }
+    .benefits-card {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 28px 32px;
+      margin-bottom: 36px;
+    }
+    .benefits-card h3 {
+      font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 18px;
+    }
+    .benefits-card ul { list-style: none; }
+    .benefits-card li {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 12px; font-size: .95rem; color: var(--text); line-height: 1.5;
+    }
+    .benefits-card li:last-child { margin-bottom: 0; }
+    .bcheck {
+      width: 20px; height: 20px; flex-shrink: 0;
+      background: var(--acc-soft); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .bcheck svg { width: 11px; height: 11px; }
+
+    /* ── Section header (p2-p4) ───────────────────────────────────────────── */
+    .section-title {
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 600; margin-bottom: 8px;
+    }
+    .section-sub {
+      font-size: .95rem; color: var(--muted);
+      margin-bottom: 36px; line-height: 1.55;
+    }
+    .sub-label {
+      font-family: var(--ff-head); font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--muted); margin-bottom: 16px; display: block;
+    }
+
+    /* ── Separador ────────────────────────────────────────────────────────── */
+    .sep {
+      border: none; border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+
+    /* ── Panel / grupo de campos ──────────────────────────────────────────── */
+    .field-panel {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .field-panel-title {
+      font-family: var(--ff-head); font-size: .8rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--muted); margin-bottom: 20px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Field group ──────────────────────────────────────────────────────── */
+    .fg { margin-bottom: 14px; }
+    .fg:last-child { margin-bottom: 0; }
+    .fg label {
+      display: block; font-size: .82rem; font-weight: 600;
+      color: var(--text); margin-bottom: 7px; line-height: 1.4;
+    }
+    .fg label .opt { font-weight: 400; color: var(--muted); font-size: .79rem; }
+    .fg input, .fg textarea {
+      width: 100%;
+      padding: .65rem .9rem;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-sm);
+      color: var(--ink);
+      font-size: .92rem;
+      font-family: var(--ff-body);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .fg input::placeholder, .fg textarea::placeholder { color: var(--muted); }
+    .fg input:focus, .fg textarea:focus {
+      outline: none;
+      border-color: var(--acc-line);
+      box-shadow: 0 0 0 3px var(--acc-soft);
+    }
+    .fg input.invalid, .fg textarea.invalid { border-color: rgba(228,70,43,.5); }
+    .fg textarea { resize: vertical; min-height: 88px; }
+
+    /* ── Checkbox tiles ───────────────────────────────────────────────────── */
+    .chk-note { font-size: .79rem; color: var(--muted); display: block; margin-bottom: 10px; margin-top: -4px; }
+    .chk-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 400px) { .chk-grid { grid-template-columns: 1fr; } }
+
+    .ci {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-sm);
+      cursor: pointer; font-size: .875rem; color: var(--text);
+      user-select: none;
+      transition: all .15s;
+    }
+    .ci:hover { border-color: var(--acc-line); color: var(--ink); background: var(--acc-soft); }
+    .ci input { display: none; }
+    .ci.on { border-color: var(--acc-line); background: var(--acc-soft); color: var(--acc-2); font-weight: 600; }
+    .ci .box {
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--line-3);
+      border-radius: 4px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .ci.on .box { background: var(--acc); border-color: var(--acc); }
+    .ci.on .box::after {
+      content: '';
+      width: 4px; height: 8px;
+      border: 2px solid #fff; border-top: 0; border-left: 0;
+      transform: rotate(45deg) translateY(-1px);
+      display: block;
+    }
+
+    /* ── Radio tiles ──────────────────────────────────────────────────────── */
+    .ri-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 4px; }
+    .ri {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-sm);
+      cursor: pointer; font-size: .875rem; color: var(--text);
+      user-select: none;
+      transition: all .15s;
+    }
+    .ri:hover { border-color: var(--acc-line); color: var(--ink); background: var(--acc-soft); }
+    .ri input { display: none; }
+    .ri.on { border-color: var(--acc-line); background: var(--acc-soft); color: var(--acc-2); font-weight: 600; }
+    .rdot {
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--line-3);
+      border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .ri.on .rdot { border-color: var(--acc); }
+    .ri.on .rdot::after {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--acc);
+      border-radius: 50%; display: block;
+    }
+
+    /* ── Botones nav ──────────────────────────────────────────────────────── */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 32px; gap: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--ff-head); font-weight: 500; font-size: .95rem;
+      padding: 12px 22px; border-radius: var(--r-md);
+      border: 1px solid transparent; cursor: pointer;
+      transition: transform .18s, box-shadow .2s, background .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 8px 26px -8px var(--glow), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px var(--glow); }
+    .btn-ghost {
+      background: rgba(255,255,255,.04); color: var(--ink);
+      border-color: var(--line-2);
+    }
+    .btn-ghost:hover { border-color: var(--line-3); background: rgba(255,255,255,.07); transform: translateY(-2px); }
+    .btn-submit {
+      background: linear-gradient(135deg, #5ab82f, #3d8a1e); color: #fff;
+      box-shadow: 0 8px 26px -8px rgba(90,184,47,.4), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(90,184,47,.45); }
+
+    /* ── Loading ──────────────────────────────────────────────────────────── */
+    .loading-page { padding: 100px 24px; text-align: center; position: relative; z-index: 1; }
+    .spinner {
+      width: 52px; height: 52px;
+      border: 3px solid var(--line-2);
+      border-top-color: var(--acc);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin: 0 auto 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-family: var(--ff-head); font-size: 1.15rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+    .loading-sub { font-size: .88rem; color: var(--muted); }
+
+    /* ── Página final (p5) ────────────────────────────────────────────────── */
+    .proceso-section { padding: 52px 0 80px; position: relative; z-index: 1; }
+    .proceso-title {
+      font-family: var(--ff-head); font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--muted);
+      text-align: center; margin-bottom: 28px;
+    }
+    .steps-track {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0; margin: 0 auto 40px; width: fit-content;
+    }
+    .step-row { display: flex; align-items: center; gap: 18px; }
+    .step-num {
+      width: 46px; height: 46px;
+      background: var(--panel-2);
+      border: 1px solid var(--acc-line);
+      border-radius: 50%;
+      font-family: var(--ff-head); font-size: 1.05rem; font-weight: 600;
+      color: var(--acc-2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px -4px var(--glow);
+    }
+    .step-active .step-num {
+      background: var(--grad);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 20px -4px var(--glow);
+    }
+    .step-name {
+      font-family: var(--ff-head); font-size: .95rem; font-weight: 500; color: var(--ink);
+    }
+    .step-connector { display: flex; justify-content: center; align-items: center; }
+    .step-line-dot {
+      width: 46px; display: flex; justify-content: center;
+    }
+    .step-line-inner { width: 1px; height: 26px; background: var(--line-2); }
+
+    .thankyou-card {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 32px 36px;
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .thankyou-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad);
+    }
+    .thankyou-card h2 {
+      font-size: 1.25rem; font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .thankyou-card p { font-size: .9rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── Diagnóstico resultado ────────────────────────────────────────────── */
+    .diag-card {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 28px 32px;
+      margin-top: 20px;
+    }
+    .diag-card h3 {
+      font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--acc-2); margin-bottom: 16px;
+    }
+    .diag-content {
+      font-size: .9rem; line-height: 1.8;
+      color: var(--text); white-space: pre-wrap;
+    }
+
+    /* ── Error ────────────────────────────────────────────────────────────── */
+    .err-box {
+      background: rgba(228,70,43,.08);
+      border: 1px solid rgba(228,70,43,.25);
+      border-radius: var(--r-md); padding: 12px 16px;
+      color: #f28b7a; font-size: .85rem; margin-top: 16px;
+      display: none;
+    }
+
+    /* ── Success icon ─────────────────────────────────────────────────────── */
+    .success-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, rgba(122,179,23,.2), rgba(122,179,23,.08));
+      border: 1px solid rgba(122,179,23,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .success-icon svg { width: 28px; height: 28px; }
+
+    @media (max-width: 520px) {
+      .field-panel { padding: 18px 18px; }
+      .thankyou-card { padding: 24px 20px; }
+      .diag-card { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Glows decorativos de fondo -->
+<div class="glow glow--a"></div>
+<div class="glow glow--b"></div>
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<div class="top-bar">
+  <div class="top-bar__inner">
+    <a class="brand" href="../../index.html">
+      <img src="../../assets/logo.png" alt="Infouno" onerror="this.style.display='none'">
+      <span>infouno<b>.ia</b></span>
+    </a>
+    <div class="prog-wrap">
+      <div class="prog-bar" id="pbar"></div>
+    </div>
+    <div class="prog-label" id="plabel">Inicio</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 1 — PORTADA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-1">
+  <div class="wrap">
+    <span class="eyebrow">Método UNO® · Diagnóstico Nivel 1</span>
+    <h1 class="cover-title">
+      Entendemos tu negocio<br>
+      <span class="grad">antes de proponer cualquier solución.</span>
+    </h1>
+    <p class="cover-lead">
+      Este formulario nos permite conocer mejor tu empresa, tus objetivos y tu situación actual.
+      Con esa información preparamos una propuesta digital 100&nbsp;% personalizada para vos.
+    </p>
+
+    <div class="benefits-card">
+      <h3>Al completar este diagnóstico vas a obtener:</h3>
+      <ul>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Un análisis de tu presencia digital actual
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Identificación de las principales oportunidades de crecimiento
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Una propuesta estratégica personalizada para tu empresa
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Una reunión de 30 minutos sin costo para definir el camino
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-row" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="goTo(2)">
+        Comenzar diagnóstico
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 2 — INFORMACIÓN DE EMPRESA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+  <div class="wrap">
+    <span class="eyebrow">Paso 1 de 3</span>
+    <h2 class="section-title">Conozcamos su empresa</h2>
+    <p class="section-sub">Datos de contacto e información general sobre la organización.</p>
+
+    <div class="field-panel">
+      <div class="field-panel-title">Información de contacto</div>
+      <div class="form-row">
+        <div class="fg"><label for="empresa">Nombre de la empresa</label>
+          <input type="text" id="empresa" placeholder="Ej: Distribuidora López S.A."></div>
+        <div class="fg"><label for="contacto">Persona de contacto</label>
+          <input type="text" id="contacto" placeholder="Nombre y apellido"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label for="cargo">Cargo</label>
+          <input type="text" id="cargo" placeholder="Ej: Gerente, Dueño"></div>
+        <div class="fg"><label for="telefono">Teléfono / WhatsApp</label>
+          <input type="tel" id="telefono" placeholder="+54 9 11 xxxx-xxxx"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label for="email">Email</label>
+          <input type="email" id="email" placeholder="empresa@ejemplo.com"></div>
+        <div class="fg"><label for="sitio">Sitio web <span class="opt">(si posee)</span></label>
+          <input type="url" id="sitio" placeholder="https://www.empresa.com"></div>
+      </div>
+      <div class="fg"><label for="redes">Redes sociales <span class="opt">(si posee)</span></label>
+        <input type="text" id="redes" placeholder="Ej: @empresa en Instagram · /empresa en Facebook"></div>
+    </div>
+
+    <div class="field-panel">
+      <div class="field-panel-title">Sobre el negocio</div>
+      <div class="fg"><label for="rubro">¿A qué se dedica su empresa?</label>
+        <textarea id="rubro" placeholder="Explíquenos brevemente qué hace su empresa..."></textarea></div>
+      <div class="fg">
+        <label class="sub-label" style="margin-bottom:10px">¿Hace cuánto tiempo trabaja en el mercado?</label>
+        <div class="ri-group" id="grp-antiguedad">
+          <label class="ri" onclick="pickRadio(this,'grp-antiguedad')"><input type="radio" name="antiguedad" value="Menos de 1 año"><span class="rdot"></span>Menos de 1 año</label>
+          <label class="ri" onclick="pickRadio(this,'grp-antiguedad')"><input type="radio" name="antiguedad" value="Entre 1 y 5 años"><span class="rdot"></span>Entre 1 y 5 años</label>
+          <label class="ri" onclick="pickRadio(this,'grp-antiguedad')"><input type="radio" name="antiguedad" value="Más de 5 años"><span class="rdot"></span>Más de 5 años</label>
+          <label class="ri" onclick="pickRadio(this,'grp-antiguedad')"><input type="radio" name="antiguedad" value="Más de 10 años"><span class="rdot"></span>Más de 10 años</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(1)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(3)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 3 — SU NEGOCIO
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-3">
+  <div class="wrap">
+    <span class="eyebrow">Paso 2 de 3</span>
+    <h2 class="section-title">Su negocio</h2>
+    <p class="section-sub">Queremos entender qué ofrecen, a quiénes y cuáles son sus prioridades este año.</p>
+
+    <div class="field-panel">
+      <div class="fg"><label for="productos">¿Qué productos o servicios ofrece?</label>
+        <textarea id="productos" placeholder="Describa brevemente su oferta..."></textarea></div>
+
+      <div class="fg">
+        <label class="sub-label">¿Quiénes son sus principales clientes?</label>
+        <span class="chk-note">Puede seleccionar más de uno.</span>
+        <div class="chk-grid">
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Empresas"><span class="box"></span>Empresas</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Industrias"><span class="box"></span>Industrias</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Comercios"><span class="box"></span>Comercios</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Profesionales"><span class="box"></span>Profesionales</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Municipios"><span class="box"></span>Municipios</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Constructoras"><span class="box"></span>Constructoras</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Arquitectos"><span class="box"></span>Arquitectos</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Público en general"><span class="box"></span>Público en general</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="clientes" value="Otros"><span class="box"></span>Otros</label>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="sub-label">¿Cuál es el principal objetivo del nuevo sitio?</label>
+        <span class="chk-note">Seleccione hasta tres.</span>
+        <div class="chk-grid">
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Conseguir más consultas"><span class="box"></span>Conseguir más consultas</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Generar más ventas"><span class="box"></span>Generar más ventas</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Mostrar mis productos"><span class="box"></span>Mostrar mis productos</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Mejorar la imagen"><span class="box"></span>Mejorar la imagen</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Posicionarme en Google"><span class="box"></span>Posicionarme en Google</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Automatizar tareas"><span class="box"></span>Automatizar tareas</label>
+          <label class="ci" onclick="tickMax(this,'objetivos',3)"><input type="checkbox" name="objetivos" value="Otro"><span class="box"></span>Otro</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-panel">
+      <div class="fg"><label for="mas-rentable">¿Qué producto o servicio le deja mayor rentabilidad?</label>
+        <input type="text" id="mas-rentable" placeholder="Ej: instalaciones eléctricas industriales"></div>
+      <div class="fg"><label for="vender-mas">¿Qué producto desea vender más durante este año?</label>
+        <input type="text" id="vender-mas" placeholder="Ej: servicio de mantenimiento preventivo"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(2)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(4)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 4 — RECURSOS Y VISIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-4">
+  <div class="wrap">
+    <span class="eyebrow">Paso 3 de 3</span>
+    <h2 class="section-title">Recursos y visión</h2>
+    <p class="section-sub">Las últimas preguntas — nos ayudan a entender mejor su negocio y sus expectativas.</p>
+
+    <div class="field-panel">
+      <div class="fg">
+        <label class="sub-label">Marque lo que ya posee:</label>
+        <div class="chk-grid">
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Logo"><span class="box"></span>Logo</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Manual de marca"><span class="box"></span>Manual de marca</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Fotografías"><span class="box"></span>Fotografías</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Catálogo PDF"><span class="box"></span>Catálogo PDF</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Videos"><span class="box"></span>Videos</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Fichas técnicas"><span class="box"></span>Fichas técnicas</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Lista de productos"><span class="box"></span>Lista de productos</label>
+          <label class="ci" onclick="tick(this)"><input type="checkbox" name="recursos" value="Casos de éxito"><span class="box"></span>Casos de éxito</label>
+        </div>
+      </div>
+      <div class="fg"><label for="sitios-ref">¿Qué tres sitios web le gustan?</label>
+        <textarea id="sitios-ref" placeholder="Ej: mercadolibre.com — por su catálogo claro · despegar.com — por la experiencia de búsqueda"></textarea></div>
+      <div class="fg"><label for="competencia">¿Cuál considera que es su principal competencia?</label>
+        <input type="text" id="competencia" placeholder="Nombre de empresa o sitio web"></div>
+    </div>
+
+    <div class="field-panel">
+      <div class="field-panel-title">Para finalizar...</div>
+      <div class="fg">
+        <label for="exito">Si este proyecto fuera un éxito dentro de un año, ¿qué tendría que haber logrado para que usted diga <em style="color:var(--acc-2)">"Valió la pena la inversión"</em>?</label>
+        <textarea id="exito" placeholder="Sea específico: más ventas, más consultas, ahorro de tiempo..."></textarea>
+      </div>
+      <div class="fg"><label for="pregunta-clientes">¿Qué pregunta hacen casi todos sus clientes antes de comprar?</label>
+        <textarea id="pregunta-clientes" placeholder="Ej: ¿Cuánto demora la entrega? ¿Tienen garantía?"></textarea></div>
+      <div class="fg"><label for="info-extra">¿Hay algo importante que deberíamos saber antes de comenzar? <span class="opt">(opcional)</span></label>
+        <textarea id="info-extra" placeholder="Cualquier información adicional que nos ayude a entender mejor su negocio..."></textarea></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(3)">← Atrás</button>
+      <button class="btn btn-submit" onclick="submitForm()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M2 6l3 3 5-5"/><rect x="3" y="3" width="14" height="14" rx="2"/></svg>
+        Enviar diagnóstico
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const STEPS = ['','Inicio','Su empresa','Su negocio','Recursos'];
+const PCTS  = [0, 0, 33, 66, 90];
+let cur = 1;
+
+function updateHeader(n) {
+  document.getElementById('pbar').style.width   = (PCTS[n] ?? 100) + '%';
+  document.getElementById('plabel').textContent = STEPS[n] ?? 'Listo';
+}
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + n);
+  if (pg) pg.classList.add('active');
+  cur = n;
+  updateHeader(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goTo(n) {
+  if (n > cur && !validate(cur)) return;
+  showPage(n);
+}
+
+const REQUIRED = {
+  2: ['empresa','contacto','cargo','telefono','email','rubro'],
+  3: ['productos','mas-rentable','vender-mas'],
+  4: ['sitios-ref','competencia','exito','pregunta-clientes'],
+};
+
+function validate(n) {
+  let ok = true;
+  (REQUIRED[n] || []).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.value.trim()) return;
+    el.classList.add('invalid');
+    el.addEventListener('input', () => el.classList.remove('invalid'), { once: true });
+    if (ok) el.focus();
+    ok = false;
+  });
+  if (n === 2 && !document.querySelector('input[name="antiguedad"]:checked')) {
+    const grp = document.getElementById('grp-antiguedad');
+    grp.style.outline = '2px solid rgba(228,70,43,.5)';
+    grp.style.borderRadius = '8px';
+    setTimeout(() => { grp.style.outline = ''; }, 2000);
+    ok = false;
+  }
+  return ok;
+}
+
+function tick(el) {
+  el.classList.toggle('on');
+  el.querySelector('input').checked = el.classList.contains('on');
+}
+function tickMax(el, name, max) {
+  if (!el.classList.contains('on') &&
+      document.querySelectorAll(`input[name="${name}"]:checked`).length >= max) return;
+  el.classList.toggle('on');
+  el.querySelector('input').checked = el.classList.contains('on');
+}
+function pickRadio(el, grpId) {
+  document.querySelectorAll(`#${grpId} .ri`).forEach(r => r.classList.remove('on'));
+  el.classList.add('on');
+  el.querySelector('input').checked = true;
+}
+
+function checked(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
+}
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function collect() {
+  return {
+    empresa: val('empresa'), contacto: val('contacto'), cargo: val('cargo'),
+    telefono: val('telefono'), email: val('email'), sitio: val('sitio'), redes: val('redes'),
+    rubro: val('rubro'),
+    antiguedad: document.querySelector('input[name="antiguedad"]:checked')?.value ?? '',
+    productos: val('productos'),
+    clientes: checked('clientes'), objetivos: checked('objetivos'),
+    masRentable: val('mas-rentable'), venderMas: val('vender-mas'),
+    recursos: checked('recursos'),
+    sitiosRef: val('sitios-ref'), competencia: val('competencia'),
+    exito: val('exito'), preguntaClientes: val('pregunta-clientes'), infoExtra: val('info-extra'),
+  };
+}
+
+async function submitForm() {
+  if (!validate(4)) return;
+  const data = collect();
+
+  // Loading full-page
+  document.body.innerHTML = `
+    ${document.querySelector('.top-bar').outerHTML.replace('</div></div>','').replace(/<div class="prog-bar"[^>]*>/, '<div class="prog-bar" style="width:95%">') + '</div></div>'}
+    <div class="loading-page">
+      <div class="spinner"></div>
+      <div class="loading-title">Analizando tu diagnóstico...</div>
+      <div class="loading-sub">Preparando un resumen personalizado para tu empresa</div>
+    </div>
+    <div class="glow glow--a"></div>
+    <div class="glow glow--b"></div>`;
+
+  try {
+    const res  = await fetch('/api/diagnostico', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    renderThankYou(json.diagnostico ?? null, json.error ?? null);
+  } catch (e) {
+    renderThankYou(null, 'Error de conexión. El equipo de Infouno se comunicará con vos a la brevedad.');
+  }
+}
+
+const PASOS = [['①','Descubrir'],['②','Diagnosticar'],['③','Diseñar'],['④','Construir'],['⑤','Potenciar']];
+
+function renderThankYou(diagnostico, error) {
+  const stepsHTML = PASOS.map(([num, name], i) => `
+    <div class="step-row ${i === 1 ? 'step-active' : ''}">
+      <div class="step-num">${num}</div>
+      <div class="step-name">${name}</div>
+    </div>
+    ${i < PASOS.length - 1 ? `<div class="step-connector"><div class="step-line-dot"><div class="step-line-inner"></div></div><div></div></div>` : ''}
+  `).join('');
+
+  const diagHTML = diagnostico ? `
+    <div class="diag-card">
+      <h3>Resumen de diagnóstico preliminar</h3>
+      <div class="diag-content">${esc(diagnostico)}</div>
+    </div>` : '';
+
+  const errHTML = error ? `<div class="err-box" style="display:block">${esc(error)}</div>` : '';
+
+  document.body.innerHTML = `
+    <div class="glow glow--a"></div>
+    <div class="glow glow--b"></div>
+    <div class="top-bar">
+      <div class="top-bar__inner">
+        <a class="brand" href="../../index.html">infouno<b>.ia</b></a>
+        <div class="prog-wrap"><div class="prog-bar" style="width:100%"></div></div>
+        <div class="prog-label">Listo</div>
+      </div>
+    </div>
+    <div class="proceso-section">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:36px">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7AB317" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h2 style="font-size:clamp(1.5rem,3.5vw,2rem);font-weight:600;margin-bottom:10px">¡Diagnóstico enviado!</h2>
+          <p style="color:var(--muted);font-size:.95rem">Nuestro equipo lo revisará y te contactará a la brevedad.</p>
+        </div>
+
+        <div class="proceso-title">Método UNO®</div>
+        <div class="steps-track">${stepsHTML}</div>
+
+        <div class="thankyou-card">
+          <h2>Gracias por completar este diagnóstico.</h2>
+          <p>Con esta información prepararemos una propuesta personalizada y coordinaremos una reunión para definir la estrategia digital de su empresa.</p>
+        </div>
+
+        ${diagHTML}
+        ${errHTML}
+      </div>
+    </div>`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
