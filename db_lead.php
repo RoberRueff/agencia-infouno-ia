@@ -77,7 +77,10 @@ function infouno_save_lead($cfg, $in) {
 
   // Conexión
   $db = @new mysqli($cfg['db_host'], $cfg['db_user'], $cfg['db_pass'], $cfg['db_name']);
-  if ($db->connect_errno) return ['ok' => false, 'error' => 'db'];
+  if ($db->connect_errno) {
+    @error_log('infouno DB connect: (' . $db->connect_errno . ') ' . $db->connect_error);
+    return ['ok' => false, 'error' => 'db'];
+  }
   $db->set_charset('utf8mb4');
 
   // ¿Ya existe? (para no notificar dos veces: email y WhatsApp por separado)
@@ -124,6 +127,7 @@ function infouno_save_lead($cfg, $in) {
     $vSource, $vPage, $vUs, $vUm, $vUc, $score, $vip
   );
   $ok = $stmt->execute();
+  if (!$ok) @error_log('infouno DB insert: ' . $stmt->error);
   $stmt->close();
 
   // Notificación por email (una sola vez). Solo cuando el lead tiene sustancia:
