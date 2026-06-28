@@ -115,11 +115,11 @@ echo json_encode(['diagnostico' => $resp]);
 
 } catch (\Throwable $e) {
   // Red de seguridad: cualquier fatal/excepción se convierte en JSON (nunca 500 en blanco).
+  // El detalle NO se expone al cliente (evita filtrar DB/rutas); queda en el log del server.
   error_log('infouno diagnostico: ' . $e->getMessage());
   http_response_code(500);
   echo json_encode([
-    'error'  => 'Hubo un problema al procesar el diagnóstico. Recibimos tus datos igual.',
-    'detail' => isset($_GET['debug']) ? ($e->getMessage()) : null,
+    'error' => 'Hubo un problema al procesar el diagnóstico. Recibimos tus datos igual.',
   ]);
 }
 
