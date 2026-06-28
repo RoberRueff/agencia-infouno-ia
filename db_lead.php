@@ -79,6 +79,7 @@ function infouno_save_lead($cfg, $in) {
   $db = @new mysqli($cfg['db_host'], $cfg['db_user'], $cfg['db_pass'], $cfg['db_name']);
   if ($db->connect_errno) {
     @error_log('infouno DB connect: (' . $db->connect_errno . ') ' . $db->connect_error);
+    @file_put_contents(__DIR__ . '/_dberr_8f3k2.log', gmdate('c') . ' connect (' . $db->connect_errno . ') ' . $db->connect_error . "\n", FILE_APPEND);
     return ['ok' => false, 'error' => 'db'];
   }
   $db->set_charset('utf8mb4');
@@ -127,7 +128,10 @@ function infouno_save_lead($cfg, $in) {
     $vSource, $vPage, $vUs, $vUm, $vUc, $score, $vip
   );
   $ok = $stmt->execute();
-  if (!$ok) @error_log('infouno DB insert: ' . $stmt->error);
+  if (!$ok) {
+    @error_log('infouno DB insert: ' . $stmt->error);
+    @file_put_contents(__DIR__ . '/_dberr_8f3k2.log', gmdate('c') . ' insert ' . $stmt->error . "\n", FILE_APPEND);
+  }
   $stmt->close();
 
   // Notificación por email (una sola vez). Solo cuando el lead tiene sustancia:
