@@ -184,10 +184,17 @@ function infouno_diag_llm($cfg, $system, $user) {
   ]);
   $raw  = curl_exec($ch);
   $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  $cerr = curl_error($ch);
   curl_close($ch);
-  if ($raw === false || $code !== 200) return null;
+  if ($raw === false || $code !== 200) {
+    error_log('infouno diag LLM: code=' . $code . ' curlerr=' . $cerr . ' body=' . substr((string) $raw, 0, 400));
+    return null;
+  }
 
   $data = json_decode($raw, true);
   $text = $data['choices'][0]['message']['content'] ?? '';
+  if (trim((string) $text) === '') {
+    error_log('infouno diag LLM: 200 pero content vacío. finish=' . ($data['choices'][0]['finish_reason'] ?? '?') . ' body=' . substr((string) $raw, 0, 400));
+  }
   return is_string($text) ? trim($text) : null;
 }
