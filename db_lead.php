@@ -4,6 +4,11 @@
    Sanitización + mapeo a taxonomía + scoring/VIP (R3) + upsert (R4) + email.
    ===================================================================== */
 
+// PHP 8.1+ pone mysqli en modo "throw" por defecto; este código está escrito para
+// chequear errores con returns (connect_errno, prepare()===false). Lo volvemos al
+// modo silencioso para que un problema de DB degrade con gracia y no tire un fatal.
+mysqli_report(MYSQLI_REPORT_OFF);
+
 if (!function_exists('s')) {
   function s($v, $max = 190) {
     $v = is_string($v) ? trim($v) : '';

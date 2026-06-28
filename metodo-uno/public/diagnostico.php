@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   exit;
 }
 
+try {
+
 $cfg = require __DIR__ . '/../../config.php';
 
 // Rate-limit (anti-abuso del endpoint pago). Bucket separado del chat/lead.
@@ -110,6 +112,16 @@ if ($resp === null || $resp === '') {
 }
 
 echo json_encode(['diagnostico' => $resp]);
+
+} catch (\Throwable $e) {
+  // Red de seguridad: cualquier fatal/excepción se convierte en JSON (nunca 500 en blanco).
+  error_log('infouno diagnostico: ' . $e->getMessage());
+  http_response_code(500);
+  echo json_encode([
+    'error'  => 'Hubo un problema al procesar el diagnóstico. Recibimos tus datos igual.',
+    'detail' => isset($_GET['debug']) ? ($e->getMessage()) : null,
+  ]);
+}
 
 /* ===================================================================== */
 
