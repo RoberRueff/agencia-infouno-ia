@@ -167,7 +167,9 @@ function infouno_diag_llm($cfg, $system, $user) {
   $payload = json_encode([
     'model'       => $cfg['openai_model'] ?? 'gpt-4o-mini',
     'temperature' => 0.3,
-    'max_tokens'  => 1024,
+    // Holgado a propósito: gemini-2.5-flash es un modelo "thinking" y consume
+    // tokens razonando; con poco margen devolvía el diagnóstico vacío o truncado.
+    'max_tokens'  => 4096,
     'messages'    => [
       ['role' => 'system', 'content' => $system],
       ['role' => 'user',   'content' => $user],
