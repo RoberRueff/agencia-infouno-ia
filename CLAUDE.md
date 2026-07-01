@@ -29,8 +29,9 @@ Sitio corporativo + chatbot "Uno" para **captar y cualificar leads** de PyMEs ar
 | `assets/site.js` | Toda la lógica frontend: WhatsApp, calculadora ROI, bot "Uno" (IA + guion), agenda, leads, Tweaks. |
 | `chat.php` | Proxy del bot al LLM vía API compatible con OpenAI (OpenAI/Gemini según `api_base`); function calling + fallback. La API key vive solo aquí (vía `config.php`). |
 | `lead.php` / `db_lead.php` | Recepción y persistencia de leads (upsert por `session_id`, scoring/VIP, email). |
-| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`/`lead.php`/`diagnostico.php`. Anti-spam de leads (honeypot + throttling). |
+| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`/`lead.php`/`diagnostico.php`/`diagnostico2.php`. Anti-spam de leads (honeypot + throttling). |
 | `metodo-uno/` | Landing del **Método UNO® — Diagnóstico Nivel 1** (wizard) + `public/diagnostico.php`: proxea al LLM (reusa `config.php`) y persiste el lead vía `db_lead.php` (`source=metodo-uno`). PHP, sin Node. Enlazada desde el nav/CTA del home. |
+| `metodo-dos/` | **Método DOS® — Diagnóstico Inteligente Nivel 2 (IOI®)**: wizard de 4 fases + `public/diagnostico2.php`. Motor de scoring **modular y puro** en `src/Scoring/` (`IOIEngine` + `ScoringConfig`), con tests en `tests/` (`php metodo-dos/tests/IOIEngineTest.php`). Calcula el IOI® (0–100) determinístico, costo de inacción y 3 puntos críticos; persiste el lead (`source=metodo-dos`) y pide el narrativo al LLM. Enlazada desde el CTA del home. |
 | `config.php` | Credenciales MySQL + LLM (`api_base`/key) + emails. **No se versiona** (`.gitignore`); plantilla en `config.sample.php`. Guía de deploy en `ai/deploy-checklist.md`. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento inyectada en el system prompt de `chat.php`. |
 | `db/schema.sql` | DDL de `wp_infouno_leads`. |
