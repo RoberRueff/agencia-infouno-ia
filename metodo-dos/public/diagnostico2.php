@@ -75,6 +75,9 @@ try {
     'whatsapp'   => $d['telefono'] ?? '',
     'mensaje'    => $resumen,
     'page'       => 'metodo-dos/public/metodo-dos-nivel2.html',
+    'utm_source'   => $d['utm_source']   ?? '',
+    'utm_medium'   => $d['utm_medium']   ?? '',
+    'utm_campaign' => $d['utm_campaign'] ?? '',
   ]);
 
   // 3) Narrativo con el LLM (redacta sobre números YA calculados; no puntúa).

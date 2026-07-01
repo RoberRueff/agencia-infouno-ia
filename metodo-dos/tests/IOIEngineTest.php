@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+// Solo por línea de comandos: nunca ejecutable vía web (evita exponer la lógica interna).
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=utf-8');
+    exit("403 — este archivo solo corre por CLI.\n");
+}
+
 require_once __DIR__ . '/../src/Scoring/IOIEngine.php';
 
 $tests = 0; $failures = 0;
