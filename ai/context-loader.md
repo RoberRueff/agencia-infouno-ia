@@ -42,6 +42,11 @@
 | `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`, `lead.php` y `diagnostico.php`; anti-spam de leads (honeypot + throttling). Ver `ai/security-audit.md` (H1/M2). |
 | `metodo-uno/public/metodo-uno-nivel1.html` | Landing del **Método UNO® — Diagnóstico Nivel 1**: wizard de 4 pasos (JS inline). Postea a `diagnostico.php`. Enlazada desde el nav/CTA del home. |
 | `metodo-uno/public/diagnostico.php` | Endpoint del diagnóstico: valida + honeypot + rate-limit, **persiste el lead** (`db_lead.php`, `source=metodo-uno`) y proxea al LLM reusando `config.php`. PHP, sin Node. |
+| `metodo-dos/public/metodo-dos-nivel2.html` | Landing del **Método DOS® — Diagnóstico Inteligente Nivel 2 (IOI®)**: wizard de 4 fases (JS inline). Postea a `diagnostico2.php`. Enlazada desde el CTA del home. |
+| `metodo-dos/public/diagnostico2.php` | Endpoint del Nivel 2: rate-limit + honeypot, calcula el **IOI® determinístico** (`src/Scoring/IOIEngine.php`), **persiste el lead** (`db_lead.php`, `source=metodo-dos`) y pide el narrativo al LLM (`config.php`). |
+| `metodo-dos/src/Scoring/IOIEngine.php` | Motor IOI® (lógica pura, testeable): normalización, fórmula ponderada, costo de inacción, veredicto, puntos críticos, `diagnose()`. |
+| `metodo-dos/src/Scoring/ScoringConfig.php` | Configuración tuneable del scoring: pesos de fases, valor/hora, semanas, rangos de veredicto. |
+| `metodo-dos/tests/IOIEngineTest.php` | Suite de tests del motor IOI® (PHP plano, `php metodo-dos/tests/IOIEngineTest.php`). |
 | `config.php` | Credenciales de MySQL, OpenAI y emails (completar en el server; **no se versiona**). |
 | `privacidad.html` | Política de privacidad (Ley 25.326). Enlazada desde el footer de todas las páginas. |
 | `config.sample.php` | Plantilla versionada de `config.php`, sin credenciales. |

@@ -1,5 +1,9 @@
 # Credenciales reales (se completan en el server, nunca se versionan)
 config.php
+config.php.bak*
+
+# Scratch de ejecución de tareas (no es parte del proyecto)
+.superpowers/
 
 # Material no publicado / pesado
 sin-publicar/
