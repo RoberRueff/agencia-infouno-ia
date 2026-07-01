@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico IOI® — Método DOS® · Infouno</title>
+  <meta name="description" content="Completá el diagnóstico Método DOS® y recibí tu Índice de Oportunidad Infouno (IOI®). Gratuito y sin compromiso.">
+  <link rel="icon" href="../../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Tokens (espejo del sitio principal) ──────────────────────────────── */
+    :root {
+      --bg:       #080B11;
+      --bg-2:     #0A0E16;
+      --panel:    #0E131D;
+      --panel-2:  #121829;
+      --panel-3:  #161D2E;
+      --line:     rgba(255,255,255,.07);
+      --line-2:   rgba(255,255,255,.12);
+      --line-3:   rgba(255,255,255,.20);
+      --ink:      #EEF2F8;
+      --text:     #A7B2C4;
+      --muted:    #6B7689;
+      --acc:      #3E9BE6;
+      --acc-2:    #62B4F2;
+      --acc-deep: #2A6FB5;
+      --acc-soft: rgba(62,155,230,.12);
+      --acc-line: rgba(62,155,230,.30);
+      --glow:     rgba(46,120,196,.40);
+      --green:    #7AB317;
+      --red:      #E4462B;
+      --grad:     linear-gradient(135deg,#62B4F2,#2A6FB5);
+      --shadow:   0 24px 60px -20px rgba(0,0,0,.7);
+      --ff-head:  'Space Grotesk', system-ui, sans-serif;
+      --ff-body:  'Manrope', system-ui, sans-serif;
+      --r-sm: 10px; --r-md: 14px; --r-lg: 20px;
+      --maxw: 700px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--ff-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1,h2,h3,h4 { font-family: var(--ff-head); font-weight: 600; letter-spacing: -.02em; color: var(--ink); margin: 0; }
+    p { margin: 0; }
+
+    /* ── Glow decorativo ───────────────────────────────────────────────────── */
+    .glow {
+      position: fixed; border-radius: 50%;
+      filter: blur(90px); pointer-events: none; z-index: 0;
+    }
+    .glow--a { width: 520px; height: 520px; top: -180px; left: 50%;
+               transform: translateX(-20%);
+               background: radial-gradient(circle, rgba(46,120,196,.28), transparent 70%); }
+    .glow--b { width: 340px; height: 340px; bottom: 60px; right: -100px;
+               background: radial-gradient(circle, rgba(122,179,23,.14), transparent 70%); }
+
+    /* ── Header ───────────────────────────────────────────────────────────── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 60;
+      background: rgba(8,11,17,.82);
+      backdrop-filter: blur(16px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .top-bar__inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--ff-head); font-weight: 600; font-size: 1.15rem;
+      color: var(--ink); letter-spacing: -.02em; text-decoration: none;
+      white-space: nowrap;
+    }
+    .brand img { width: 28px; height: 28px; }
+    .brand b { color: var(--acc-2); }
+
+    .prog-wrap {
+      flex: 1;
+      height: 3px;
+      background: var(--line-2);
+      border-radius: 999px;
+    }
+    .prog-bar {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 999px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+    .prog-label {
+      font-family: var(--ff-head);
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Contenedor principal ─────────────────────────────────────────────── */
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Pages ────────────────────────────────────────────────────────────── */
+    .page { display: none; padding: 52px 0 80px; }
+    .page.active { display: block; animation: fadeUp .35s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Eyebrow badge ────────────────────────────────────────────────────── */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--ff-head); font-weight: 500; font-size: .78rem;
+      letter-spacing: .06em; color: var(--acc-2);
+      padding: 6px 13px;
+      border: 1px solid var(--line-2); border-radius: 999px;
+      background: rgba(62,155,230,.06);
+      margin-bottom: 20px;
+    }
+    .eyebrow::before {
+      content: ""; width: 6px; height: 6px;
+      border-radius: 999px; background: var(--acc);
+      box-shadow: 0 0 8px 1px var(--acc);
+    }
+
+    /* ── Portada ──────────────────────────────────────────────────────────── */
+    .cover-title {
+      font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      margin-bottom: 16px;
+    }
+    .cover-title .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .cover-lead {
+      font-size: 1.05rem; color: var(--text);
+      line-height: 1.65; margin-bottom: 32px;
+      max-width: 580px;
+    }
+    .benefits-card {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 28px 32px;
+      margin-bottom: 36px;
+    }
+    .benefits-card h3 {
+      font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 18px;
+    }
+    .benefits-card ul { list-style: none; }
+    .benefits-card li {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 12px; font-size: .95rem; color: var(--text); line-height: 1.5;
+    }
+    .benefits-card li:last-child { margin-bottom: 0; }
+    .bcheck {
+      width: 20px; height: 20px; flex-shrink: 0;
+      background: var(--acc-soft); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .bcheck svg { width: 11px; height: 11px; }
+
+    /* ── Section header ───────────────────────────────────────────────────── */
+    .section-title {
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 600; margin-bottom: 8px;
+    }
+    .section-sub {
+      font-size: .95rem; color: var(--muted);
+      margin-bottom: 36px; line-height: 1.55;
+    }
+    .sub-label {
+      font-family: var(--ff-head); font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--muted); margin-bottom: 16px; display: block;
+    }
+    /* Aclaración con ejemplos bajo una pregunta */
+    .q-hint {
+      font-size: .82rem; color: var(--muted); opacity: .9;
+      margin: -6px 0 16px; line-height: 1.5;
+    }
+
+    /* ── Separador ────────────────────────────────────────────────────────── */
+    .sep {
+      border: none; border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+
+    /* ── Panel / grupo de campos ──────────────────────────────────────────── */
+    .field-panel {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .field-panel-title {
+      font-family: var(--ff-head); font-size: .8rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--muted); margin-bottom: 20px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Field group ──────────────────────────────────────────────────────── */
+    .fg { margin-bottom: 14px; }
+    .fg:last-child { margin-bottom: 0; }
+    .fg label {
+      display: block; font-size: .82rem; font-weight: 600;
+      color: var(--text); margin-bottom: 7px; line-height: 1.4;
+    }
+    .fg label .opt { font-weight: 400; color: var(--muted); font-size: .79rem; }
+    .fg input, .fg textarea, .fg select {
+      width: 100%;
+      padding: .65rem .9rem;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-sm);
+      color: var(--ink);
+      font-size: .92rem;
+      font-family: var(--ff-body);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .fg input::placeholder, .fg textarea::placeholder { color: var(--muted); }
+    .fg input:focus, .fg textarea:focus, .fg select:focus {
+      outline: none;
+      border-color: var(--acc-line);
+      box-shadow: 0 0 0 3px var(--acc-soft);
+    }
+    .fg input.invalid, .fg textarea.invalid, .fg select.invalid { border-color: rgba(228,70,43,.5); }
+    .fg textarea { resize: vertical; min-height: 72px; }
+    .fg select { appearance: none; cursor: pointer; }
+    .fg select option { background: #121829; }
+
+    /* ── Radio tiles ──────────────────────────────────────────────────────── */
+    .ri-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 4px; }
+    .ri {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
+      background: var(--panel-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-sm);
+      cursor: pointer; font-size: .875rem; color: var(--text);
+      user-select: none;
+      transition: all .15s;
+    }
+    .ri:hover { border-color: var(--acc-line); color: var(--ink); background: var(--acc-soft); }
+    .ri input { display: none; }
+    .ri.on { border-color: var(--acc-line); background: var(--acc-soft); color: var(--acc-2); font-weight: 600; }
+    .rdot {
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--line-3);
+      border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .ri.on .rdot { border-color: var(--acc); }
+    .ri.on .rdot::after {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--acc);
+      border-radius: 50%; display: block;
+    }
+
+    /* ── Botones nav ──────────────────────────────────────────────────────── */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 32px; gap: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--ff-head); font-weight: 500; font-size: .95rem;
+      padding: 12px 22px; border-radius: var(--r-md);
+      border: 1px solid transparent; cursor: pointer;
+      transition: transform .18s, box-shadow .2s, background .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 8px 26px -8px var(--glow), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px var(--glow); }
+    .btn-ghost {
+      background: rgba(255,255,255,.04); color: var(--ink);
+      border-color: var(--line-2);
+    }
+    .btn-ghost:hover { border-color: var(--line-3); background: rgba(255,255,255,.07); transform: translateY(-2px); }
+    .btn-submit {
+      background: linear-gradient(135deg, #5ab82f, #3d8a1e); color: #fff;
+      box-shadow: 0 8px 26px -8px rgba(90,184,47,.4), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(90,184,47,.45); }
+
+    /* ── Loading ──────────────────────────────────────────────────────────── */
+    .loading-page { padding: 100px 24px; text-align: center; position: relative; z-index: 1; }
+    .spinner {
+      width: 52px; height: 52px;
+      border: 3px solid var(--line-2);
+      border-top-color: var(--acc);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin: 0 auto 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-family: var(--ff-head); font-size: 1.15rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+    .loading-sub { font-size: .88rem; color: var(--muted); }
+
+    /* ── Error ────────────────────────────────────────────────────────────── */
+    .err-box {
+      background: rgba(228,70,43,.08);
+      border: 1px solid rgba(228,70,43,.25);
+      border-radius: var(--r-md); padding: 12px 16px;
+      color: #f28b7a; font-size: .85rem; margin-top: 16px;
+    }
+
+    /* ── Consentimiento ───────────────────────────────────────────────────── */
+    .consent-note {
+      font-size: .79rem; color: var(--muted); line-height: 1.6;
+      border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;
+    }
+    .consent-note a { color: var(--acc-2); text-decoration: none; }
+    .consent-note a:hover { text-decoration: underline; }
+
+    /* ── Resultado IOI® ───────────────────────────────────────────────────── */
+    .result-section { padding: 52px 0 80px; position: relative; z-index: 1; }
+
+    .ioi-hero {
+      text-align: center; margin-bottom: 36px;
+    }
+    .ioi-score-wrap {
+      display: inline-flex; flex-direction: column; align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--acc-line);
+      border-radius: var(--r-lg);
+      padding: 32px 48px;
+      margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .ioi-score-wrap::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--grad);
+    }
+    .ioi-label {
+      font-family: var(--ff-head); font-size: .75rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase; color: var(--acc-2);
+      margin-bottom: 8px;
+    }
+    .ioi-number {
+      font-family: var(--ff-head); font-size: clamp(3.5rem, 10vw, 5rem);
+      font-weight: 700; letter-spacing: -.04em; color: var(--ink);
+      line-height: 1;
+    }
+    .ioi-number .ioi-max {
+      font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--muted); font-weight: 500;
+    }
+    .ioi-verdict-title {
+      font-family: var(--ff-head); font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 600; color: var(--acc-2); margin-top: 12px;
+    }
+    .ioi-verdict-msg {
+      font-size: .92rem; color: var(--text); margin-top: 8px; line-height: 1.6; max-width: 460px;
+    }
+
+    .result-card {
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .result-card-title {
+      font-family: var(--ff-head); font-size: .76rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .09em;
+      color: var(--acc-2); margin-bottom: 14px;
+    }
+
+    .costo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 460px) { .costo-grid { grid-template-columns: 1fr; } }
+    .costo-item {
+      background: var(--panel-2); border: 1px solid var(--line-2);
+      border-radius: var(--r-sm); padding: 14px 16px;
+    }
+    .costo-item-label { font-size: .75rem; color: var(--muted); margin-bottom: 4px; }
+    .costo-item-val { font-family: var(--ff-head); font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+
+    .criticos-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .criticos-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: var(--panel-2); border: 1px solid rgba(228,70,43,.18);
+      border-radius: var(--r-sm); padding: 10px 14px;
+      font-size: .88rem; color: var(--text);
+    }
+    .criticos-list li::before {
+      content: "!"; flex-shrink: 0;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(228,70,43,.15); color: #f28b7a;
+      font-size: .7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+
+    .narrativo-content {
+      font-size: .92rem; line-height: 1.8; color: var(--text); white-space: pre-wrap;
+    }
+
+    .cta-row {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 12px; margin-top: 32px;
+    }
+    .btn-wa {
+      background: #25D366; color: #fff;
+      box-shadow: 0 8px 26px -8px rgba(37,211,102,.35), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(37,211,102,.4); }
+    .btn-cal {
+      background: #1A73E8; color: #fff;
+      box-shadow: 0 8px 26px -8px rgba(26,115,232,.35), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-cal:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(26,115,232,.45); }
+
+    /* Nota de paso: ioi/100 circular mini gauge */
+    .fases-bar-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .fase-row { display: grid; grid-template-columns: 100px 1fr 42px; gap: 10px; align-items: center; }
+    .fase-label { font-size: .8rem; color: var(--text); }
+    .fase-track {
+      height: 6px; background: var(--line-2); border-radius: 999px; overflow: hidden;
+    }
+    .fase-fill { height: 100%; background: var(--grad); border-radius: 999px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+    .fase-score { font-family: var(--ff-head); font-size: .82rem; font-weight: 600; color: var(--acc-2); text-align: right; }
+
+    @media (max-width: 520px) {
+      .field-panel { padding: 18px 18px; }
+      .result-card { padding: 18px 18px; }
+      .ioi-score-wrap { padding: 24px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Honeypot anti-spam: invisible para humanos, los bots lo rellenan -->
+<input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"
+       style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+
+<!-- Glows decorativos de fondo -->
+<div class="glow glow--a"></div>
+<div class="glow glow--b"></div>
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<div class="top-bar">
+  <div class="top-bar__inner">
+    <a class="brand" href="../../index.html">
+      <img src="../../assets/logo.png" alt="Infouno" onerror="this.style.display='none'">
+      <span>infouno<b>.ia</b></span>
+    </a>
+    <div class="prog-wrap">
+      <div class="prog-bar" id="pbar"></div>
+    </div>
+    <div class="prog-label" id="plabel">Inicio</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 1 — PORTADA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-1">
+  <div class="wrap">
+    <span class="eyebrow">Método DOS® · Diagnóstico Nivel 2</span>
+    <h1 class="cover-title">
+      Conocé tu índice de<br>
+      <span class="grad">Oportunidad de Automatización.</span>
+    </h1>
+    <p class="cover-lead">
+      En 5 minutos calculamos tu <strong>IOI®</strong> (Índice de Oportunidad Infouno):
+      cuánto dinero y tiempo perdés hoy por no tener procesos automatizados,
+      y cuál es el potencial real de mejora en tu empresa.
+    </p>
+
+    <div class="benefits-card">
+      <h3>Al completar este diagnóstico vas a recibir:</h3>
+      <ul>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Tu puntaje IOI® (0–100) con veredicto personalizado para tu empresa
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          El costo anual estimado de la inacción en pesos argentinos
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Los 3 puntos críticos que más te están frenando hoy
+        </li>
+        <li>
+          <div class="bcheck"><svg viewBox="0 0 12 12" fill="none" stroke="#3E9BE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l3 3 5-5"/></svg></div>
+          Un análisis narrativo de nuestra consultora de IA
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-row" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="goTo(2)">
+        Iniciar diagnóstico
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 2 — DATOS DE CONTACTO
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+  <div class="wrap">
+    <span class="eyebrow">Paso 1 de 5 · Datos de contacto</span>
+    <h2 class="section-title">Sobre tu empresa</h2>
+    <p class="section-sub">Completá tus datos para que podamos enviarte el diagnóstico completo.</p>
+
+    <div class="field-panel">
+      <div class="field-panel-title">Información de contacto</div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="empresa">Nombre de la empresa</label>
+          <input type="text" id="empresa" placeholder="Ej: Distribuidora López S.A.">
+        </div>
+        <div class="fg">
+          <label for="contacto">Nombre y apellido</label>
+          <input type="text" id="contacto" placeholder="Persona de contacto">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="empresa@ejemplo.com">
+        </div>
+        <div class="fg">
+          <label for="telefono">Teléfono / WhatsApp <span class="opt">(opcional)</span></label>
+          <input type="tel" id="telefono" placeholder="+54 9 11 xxxx-xxxx">
+        </div>
+      </div>
+      <div class="fg">
+        <label for="rubro">¿A qué se dedica tu empresa?</label>
+        <input type="text" id="rubro" placeholder="Ej: distribución mayorista, servicios de mantenimiento...">
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(1)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(3)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 3 — FASE A: DOLOR / INEFICIENCIA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-3">
+  <div class="wrap">
+    <span class="eyebrow">Paso 2 de 5 · Fase A — Tareas manuales e ineficiencia</span>
+    <h2 class="section-title">¿Cuánto tiempo perdés en tareas manuales?</h2>
+    <p class="section-sub">Esta fase mide el dolor operativo real: tareas que se podrían automatizar pero hoy se hacen a mano.</p>
+
+    <!-- A1: Horas perdidas (alimenta hours_per_week directamente) -->
+    <div class="field-panel">
+      <div class="field-panel-title">Tiempo perdido en tareas repetitivas</div>
+      <div class="fg">
+        <label for="hours_per_week">¿Cuántas horas por semana estimás que se pierden en tareas repetitivas en tu equipo?</label>
+        <p class="q-hint">Ejemplos de tareas manuales: responder WhatsApp o mails repetidos, cargar pedidos a mano, pasar datos entre planillas, armar presupuestos o facturas, coordinar turnos o controlar stock.</p>
+        <input type="number" id="hours_per_week" min="0" max="80" step="1" placeholder="Ej: 10">
+        <span style="font-size:.78rem;color:var(--muted);margin-top:6px;display:block">Suma las horas de todo el equipo: carga de datos, reportes manuales, respuestas repetidas, etc.</span>
+      </div>
+    </div>
+
+    <!-- A2: Frecuencia de tareas repetitivas -->
+    <div class="field-panel">
+      <div class="field-panel-title">Frecuencia de tareas repetitivas</div>
+      <div class="fg">
+        <label class="sub-label">¿Con qué frecuencia el equipo realiza las mismas tareas manuales una y otra vez?</label>
+        <div class="ri-group" id="grp-a2">
+          <label class="ri" data-group="a2" data-points="0" data-max="4"><input type="radio" name="a2" value="0"><span class="rdot"></span>Rara vez — los procesos varían mucho</label>
+          <label class="ri" data-group="a2" data-points="1" data-max="4"><input type="radio" name="a2" value="1"><span class="rdot"></span>Algunas veces a la semana</label>
+          <label class="ri" data-group="a2" data-points="3" data-max="4"><input type="radio" name="a2" value="3"><span class="rdot"></span>Todos los días, varias tareas</label>
+          <label class="ri" data-group="a2" data-points="4" data-max="4"><input type="radio" name="a2" value="4"><span class="rdot"></span>Siempre — hay tareas críticas que se repiten decenas de veces al día</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- A3: Errores y reprocesos -->
+    <div class="field-panel">
+      <div class="field-panel-title">Errores y reprocesos</div>
+      <div class="fg">
+        <label class="sub-label">¿Con qué frecuencia hay errores que obligan a rehacer trabajo (pedidos mal tomados, datos incorrectos, comunicaciones perdidas)?</label>
+        <div class="ri-group" id="grp-a3">
+          <label class="ri" data-group="a3" data-points="0" data-max="4"><input type="radio" name="a3" value="0"><span class="rdot"></span>Casi nunca — los errores son excepcionales</label>
+          <label class="ri" data-group="a3" data-points="2" data-max="4"><input type="radio" name="a3" value="2"><span class="rdot"></span>Ocurre seguido y lleva tiempo corregirlo</label>
+          <label class="ri" data-group="a3" data-points="4" data-max="4"><input type="radio" name="a3" value="4"><span class="rdot"></span>Es un problema crónico — perdemos clientes o dinero por errores evitables</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(2)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(4)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 4 — FASE B: VOLUMEN / ESCALA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-4">
+  <div class="wrap">
+    <span class="eyebrow">Paso 3 de 5 · Fase B — Volumen de operación</span>
+    <h2 class="section-title">El tamaño de tu operación</h2>
+    <p class="section-sub">Más volumen sin sistemas = más caos. Esta fase mide cuánto impacto puede tener la automatización en función de tu escala actual.</p>
+
+    <!-- B1: Consultas o pedidos por mes -->
+    <div class="field-panel">
+      <div class="field-panel-title">Flujo de consultas o pedidos</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuántas consultas, pedidos o transacciones procesás aproximadamente por mes?</label>
+        <div class="ri-group" id="grp-b1">
+          <label class="ri" data-group="b1" data-points="1" data-max="4"><input type="radio" name="b1" value="1"><span class="rdot"></span>Menos de 50 — volumen muy bajo todavía</label>
+          <label class="ri" data-group="b1" data-points="2" data-max="4"><input type="radio" name="b1" value="2"><span class="rdot"></span>Entre 50 y 200 — flujo moderado</label>
+          <label class="ri" data-group="b1" data-points="3" data-max="4"><input type="radio" name="b1" value="3"><span class="rdot"></span>Entre 200 y 1.000 — operación de volumen significativo</label>
+          <label class="ri" data-group="b1" data-points="4" data-max="4"><input type="radio" name="b1" value="4"><span class="rdot"></span>Más de 1.000 — alto volumen, escala importante</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2: Tamaño del equipo -->
+    <div class="field-panel">
+      <div class="field-panel-title">Tamaño del equipo</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuántas personas trabajan en la empresa (incluido vos)?</label>
+        <div class="ri-group" id="grp-b2">
+          <label class="ri" data-group="b2" data-points="1" data-max="4"><input type="radio" name="b2" value="1"><span class="rdot"></span>Solo yo o hasta 3 personas</label>
+          <label class="ri" data-group="b2" data-points="2" data-max="4"><input type="radio" name="b2" value="2"><span class="rdot"></span>4 a 10 personas</label>
+          <label class="ri" data-group="b2" data-points="3" data-max="4"><input type="radio" name="b2" value="3"><span class="rdot"></span>11 a 30 personas</label>
+          <label class="ri" data-group="b2" data-points="4" data-max="4"><input type="radio" name="b2" value="4"><span class="rdot"></span>Más de 30 personas</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- B3: Clientes activos por mes -->
+    <div class="field-panel">
+      <div class="field-panel-title">Clientes activos</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuántos clientes activos tenés en promedio por mes?</label>
+        <div class="ri-group" id="grp-b3">
+          <label class="ri" data-group="b3" data-points="1" data-max="4"><input type="radio" name="b3" value="1"><span class="rdot"></span>Menos de 20 clientes</label>
+          <label class="ri" data-group="b3" data-points="2" data-max="4"><input type="radio" name="b3" value="2"><span class="rdot"></span>20 a 100 clientes</label>
+          <label class="ri" data-group="b3" data-points="3" data-max="4"><input type="radio" name="b3" value="3"><span class="rdot"></span>100 a 500 clientes</label>
+          <label class="ri" data-group="b3" data-points="4" data-max="4"><input type="radio" name="b3" value="4"><span class="rdot"></span>Más de 500 clientes</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(3)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(5)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 5 — FASE C: MADUREZ DIGITAL
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-5">
+  <div class="wrap">
+    <span class="eyebrow">Paso 4 de 5 · Fase C — Madurez digital</span>
+    <h2 class="section-title">¿Cuánto automatizás hoy?</h2>
+    <p class="section-sub">Menos herramientas hoy = más margen de mejora disponible. Esta fase mide el potencial: cuanto más manual seas, más oportunidad hay.</p>
+
+    <!-- C1: CRM / gestión de clientes -->
+    <div class="field-panel">
+      <div class="field-panel-title">Gestión de clientes (CRM)</div>
+      <div class="fg">
+        <label class="sub-label">¿Cómo gestionás la relación con tus clientes y leads?</label>
+        <p class="q-hint">Un CRM es el lugar donde guardás y hacés seguimiento de tus clientes y contactos: desde una agenda o planilla hasta un sistema dedicado (ej.: HubSpot, Pipedrive).</p>
+        <div class="ri-group" id="grp-c1">
+          <label class="ri" data-group="c1" data-points="4" data-max="4"><input type="radio" name="c1" value="4"><span class="rdot"></span>En papel, planillas o de memoria — sin sistema</label>
+          <label class="ri" data-group="c1" data-points="3" data-max="4"><input type="radio" name="c1" value="3"><span class="rdot"></span>En una planilla Excel/Sheets compartida</label>
+          <label class="ri" data-group="c1" data-points="1" data-max="4"><input type="radio" name="c1" value="1"><span class="rdot"></span>Con un CRM básico (HubSpot free, Trello, similar)</label>
+          <label class="ri" data-group="c1" data-points="0" data-max="4"><input type="radio" name="c1" value="0"><span class="rdot"></span>CRM completo con pipelines y automatizaciones activas</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- C2: Canales de atención / comunicación -->
+    <div class="field-panel">
+      <div class="field-panel-title">Automatización de canales</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuánto de tu atención al cliente o comunicación está automatizado (chatbots, respuestas automáticas, flows)?</label>
+        <p class="q-hint">Tus canales son por dónde te escriben o atendés: WhatsApp, Instagram, mail, web. "Automatizado" significa que responden solos (bots, respuestas automáticas, flujos), sin que alguien lo haga a mano.</p>
+        <div class="ri-group" id="grp-c2">
+          <label class="ri" data-group="c2" data-points="4" data-max="4"><input type="radio" name="c2" value="4"><span class="rdot"></span>Nada — todo se responde manualmente</label>
+          <label class="ri" data-group="c2" data-points="3" data-max="4"><input type="radio" name="c2" value="3"><span class="rdot"></span>Solo respuestas rápidas predefinidas en WhatsApp/Instagram</label>
+          <label class="ri" data-group="c2" data-points="1" data-max="4"><input type="radio" name="c2" value="1"><span class="rdot"></span>Tengo algún bot o flujo pero cubre poco</label>
+          <label class="ri" data-group="c2" data-points="0" data-max="4"><input type="radio" name="c2" value="0"><span class="rdot"></span>Flujos completos automatizados que resuelven sin intervención humana</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- C3: Procesos manuales internos -->
+    <div class="field-panel">
+      <div class="field-panel-title">Procesos internos</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuántos de los procesos internos (facturación, stock, reportes, onboarding) son manuales hoy?</label>
+        <div class="ri-group" id="grp-c3">
+          <label class="ri" data-group="c3" data-points="4" data-max="4"><input type="radio" name="c3" value="4"><span class="rdot"></span>Casi todos — muy pocos o ninguno automatizado</label>
+          <label class="ri" data-group="c3" data-points="3" data-max="4"><input type="radio" name="c3" value="3"><span class="rdot"></span>La mayoría son manuales, solo algunos sistematizados</label>
+          <label class="ri" data-group="c3" data-points="1" data-max="4"><input type="radio" name="c3" value="1"><span class="rdot"></span>Mitad y mitad — algunos automatizados, otros no</label>
+          <label class="ri" data-group="c3" data-points="0" data-max="4"><input type="radio" name="c3" value="0"><span class="rdot"></span>La mayoría están sistematizados y corren solos</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(4)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goTo(6)">
+        Siguiente
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PÁGINA 6 — FASE D: INTENCIÓN / ACCIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-6">
+  <div class="wrap">
+    <span class="eyebrow">Paso 5 de 5 · Fase D — Intención y acción</span>
+    <h2 class="section-title">Tu disposición para dar el paso</h2>
+    <p class="section-sub">Las últimas preguntas — miden cuánta urgencia real hay y si estás en posición de tomar decisiones.</p>
+
+    <!-- D1: Urgencia -->
+    <div class="field-panel">
+      <div class="field-panel-title">Urgencia del cambio</div>
+      <div class="fg">
+        <label class="sub-label">¿Qué tan urgente es para vos resolver la ineficiencia operativa ahora?</label>
+        <div class="ri-group" id="grp-d1">
+          <label class="ri" data-group="d1" data-points="0" data-max="4"><input type="radio" name="d1" value="0"><span class="rdot"></span>No es urgente — estoy explorando el tema</label>
+          <label class="ri" data-group="d1" data-points="2" data-max="4"><input type="radio" name="d1" value="2"><span class="rdot"></span>Es importante pero puedo esperar uno o dos meses</label>
+          <label class="ri" data-group="d1" data-points="3" data-max="4"><input type="radio" name="d1" value="3"><span class="rdot"></span>Necesito resolver esto en las próximas semanas</label>
+          <label class="ri" data-group="d1" data-points="4" data-max="4"><input type="radio" name="d1" value="4"><span class="rdot"></span>Es crítico — cada semana que pasa cuesta dinero real</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- D2: Rol decisor -->
+    <div class="field-panel">
+      <div class="field-panel-title">Poder de decisión</div>
+      <div class="fg">
+        <label class="sub-label">¿Cuál es tu rol en la decisión de adoptar una solución?</label>
+        <div class="ri-group" id="grp-d2">
+          <label class="ri" data-group="d2" data-points="1" data-max="4"><input type="radio" name="d2" value="1"><span class="rdot"></span>Soy usuario o empleado — otros deciden</label>
+          <label class="ri" data-group="d2" data-points="2" data-max="4"><input type="radio" name="d2" value="2"><span class="rdot"></span>Influyo en la decisión pero no la tomo solo</label>
+          <label class="ri" data-group="d2" data-points="3" data-max="4"><input type="radio" name="d2" value="3"><span class="rdot"></span>Soy parte del comité decisor</label>
+          <label class="ri" data-group="d2" data-points="4" data-max="4"><input type="radio" name="d2" value="4"><span class="rdot"></span>Soy el dueño o decisor final — decido yo</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- D3: Disposición a agendar -->
+    <div class="field-panel">
+      <div class="field-panel-title">Próximo paso</div>
+      <div class="fg">
+        <label class="sub-label">Si el diagnóstico confirma que hay oportunidad clara, ¿qué estarías dispuesto a hacer?</label>
+        <div class="ri-group" id="grp-d3">
+          <label class="ri" data-group="d3" data-points="0" data-max="4"><input type="radio" name="d3" value="0"><span class="rdot"></span>Solo quería ver el resultado — sin compromisos</label>
+          <label class="ri" data-group="d3" data-points="2" data-max="4"><input type="radio" name="d3" value="2"><span class="rdot"></span>Agendar una reunión de diagnóstico gratuita</label>
+          <label class="ri" data-group="d3" data-points="3" data-max="4"><input type="radio" name="d3" value="3"><span class="rdot"></span>Conocer propuestas concretas con costo y alcance</label>
+          <label class="ri" data-group="d3" data-points="4" data-max="4"><input type="radio" name="d3" value="4"><span class="rdot"></span>Avanzar lo antes posible — tengo presupuesto asignado</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nota de consentimiento Ley 25.326 -->
+    <div class="consent-note">
+      Al enviar este formulario confirmás que leíste y aceptás el tratamiento de tus datos según
+      la <a href="../../privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
+      de Infouno, en cumplimiento de la Ley 25.326 de Protección de Datos Personales de la República Argentina.
+      Tus datos se utilizan exclusivamente para preparar tu diagnóstico personalizado y no se ceden a terceros.
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(5)">← Atrás</button>
+      <button class="btn btn-submit" id="btn-enviar" onclick="submitForm()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M2 6l3 3 5-5"/><rect x="3" y="3" width="14" height="14" rx="2"/></svg>
+        Ver mi IOI®
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── Configuración de pasos ──────────────────────────────────────────────── */
+const STEPS = ['', 'Inicio', 'Tu empresa', 'Fase A', 'Fase B', 'Fase C', 'Fase D'];
+const PCTS  = [0, 0, 16, 33, 50, 66, 83];
+let cur = 1;
+
+/* ── Agenda: misma página de reservas que usa el home (window.INFOUNO.agenda) ──
+   Reutiliza la agenda ya configurada del sitio (Cal.com → consultoría 15 min, con
+   videollamada + confirmación por mail). Si se vacía, el botón "Turno para
+   videollamada" no se muestra (solo queda el de WhatsApp). */
+const AGENDA_URL = 'https://cal.com/infouno/consultoria-15-min';
+
+/* ── Session ID ──────────────────────────────────────────────────────────── */
+function getSessionId() {
+  let sid = sessionStorage.getItem('metodo2Sid');
+  if (!sid) {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      sid = crypto.randomUUID();
+    } else {
+      sid = 'metodo2-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    }
+    sessionStorage.setItem('metodo2Sid', sid);
+  }
+  return sid;
+}
+
+/* ── Navegación ──────────────────────────────────────────────────────────── */
+function updateHeader(n) {
+  document.getElementById('pbar').style.width   = (PCTS[n] !== undefined ? PCTS[n] : 100) + '%';
+  document.getElementById('plabel').textContent = STEPS[n] || 'Resultado';
+}
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var pg = document.getElementById('page-' + n);
+  if (pg) pg.classList.add('active');
+  cur = n;
+  updateHeader(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goTo(n) {
+  if (n > cur && !validate(cur)) return;
+  showPage(n);
+}
+
+/* ── Validación ──────────────────────────────────────────────────────────── */
+// Campos de texto requeridos por página
+var REQUIRED_TEXT = {
+  2: ['empresa', 'contacto', 'email'],
+};
+
+// Grupos de radio requeridos por página
+var REQUIRED_RADIO = {
+  3: ['a2', 'a3'],
+  4: ['b1', 'b2', 'b3'],
+  5: ['c1', 'c2', 'c3'],
+  6: ['d1', 'd2', 'd3'],
+};
+
+// Validación especial para página 3: hours_per_week numérico > 0
+function validatePage3Extra() {
+  var el = document.getElementById('hours_per_week');
+  var v = el ? parseFloat(el.value) : NaN;
+  if (!el || isNaN(v) || v < 0) {
+    el.classList.add('invalid');
+    el.addEventListener('input', function() { el.classList.remove('invalid'); }, { once: true });
+    el.focus();
+    return false;
+  }
+  return true;
+}
+
+function highlightGroup(groupId) {
+  var grp = document.getElementById('grp-' + groupId);
+  if (!grp) return;
+  grp.style.outline = '2px solid rgba(228,70,43,.5)';
+  grp.style.borderRadius = '8px';
+  grp.style.padding = '6px';
+  setTimeout(function() {
+    grp.style.outline = '';
+    grp.style.padding = '';
+  }, 2200);
+}
+
+function validate(n) {
+  var ok = true;
+
+  // Campos de texto
+  (REQUIRED_TEXT[n] || []).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var empty = el.value.trim() === '';
+    if (id === 'email' && !empty) {
+      // Validación básica de email
+      empty = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+    }
+    if (empty) {
+      el.classList.add('invalid');
+      el.addEventListener('input', function() { el.classList.remove('invalid'); }, { once: true });
+      if (ok) el.focus();
+      ok = false;
+    }
+  });
+
+  // Validación especial horas (página 3)
+  if (n === 3) {
+    var hoursEl = document.getElementById('hours_per_week');
+    var hv = hoursEl ? hoursEl.value.trim() : '';
+    if (hv === '' || isNaN(parseFloat(hv)) || parseFloat(hv) < 0) {
+      hoursEl.classList.add('invalid');
+      hoursEl.addEventListener('input', function() { hoursEl.classList.remove('invalid'); }, { once: true });
+      if (ok) hoursEl.focus();
+      ok = false;
+    }
+  }
+
+  // Grupos de radio
+  (REQUIRED_RADIO[n] || []).forEach(function(name) {
+    if (!document.querySelector('input[name="' + name + '"]:checked')) {
+      highlightGroup(name);
+      ok = false;
+    }
+  });
+
+  return ok;
+}
+
+/* ── Manejo de selección visual de radios ────────────────────────────────── */
+document.querySelectorAll('.ri input[type="radio"]').forEach(function(inp) {
+  inp.addEventListener('change', function() {
+    var name = inp.name;
+    document.querySelectorAll('.ri input[name="' + name + '"]').forEach(function(r) {
+      r.closest('.ri').classList.toggle('on', r.checked);
+    });
+  });
+});
+
+/* ── Helpers de lectura ──────────────────────────────────────────────────── */
+function val(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function radioVal(name) {
+  var el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : null;
+}
+
+/* ── Construcción del payload ────────────────────────────────────────────── */
+/*
+  Estructura de phases:
+    phases.A = [{points, max}]  — una entrada por pregunta de opción (excluye hours_per_week)
+    phases.B = [{points, max}, {points, max}, {points, max}]
+    phases.C = [{points, max}, {points, max}, {points, max}]
+    phases.D = [{points, max}, {points, max}, {points, max}]
+
+  critical_items: una entrada por sub-área evaluable {label, score, max}
+    El motor elige las 3 con peor ratio score/max como puntos críticos.
+*/
+function buildPayload() {
+  function riEntry(name, label) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    var labelEl = el ? el.closest('[data-group]') : null;
+    var pts  = labelEl ? parseFloat(labelEl.dataset.points) : 0;
+    var maxP = labelEl ? parseFloat(labelEl.dataset.max)    : 4;
+    // phase.points = puntos de OPORTUNIDAD (más = peor estado actual = más margen).
+    // critical.score = ESTADO ACTUAL (max - oportunidad): peor estado → menor ratio
+    // score/max → detectCriticalPoints() lo elige entre los 3 más críticos.
+    return {
+      phase:    { points: pts, max: maxP },
+      critical: { label: label, score: (maxP - pts), max: maxP },
+    };
+  }
+
+  var a2 = riEntry('a2', 'Tareas repetitivas frecuentes');
+  var a3 = riEntry('a3', 'Errores y reprocesos');
+  var b1 = riEntry('b1', 'Volumen de consultas sin sistematizar');
+  var b2 = riEntry('b2', 'Escala del equipo sin automatizar');
+  var b3 = riEntry('b3', 'Base de clientes sin CRM');
+  var c1 = riEntry('c1', 'Uso de CRM');
+  var c2 = riEntry('c2', 'Automatización de canales');
+  var c3 = riEntry('c3', 'Procesos internos manuales');
+  var d1 = riEntry('d1', 'Urgencia del cambio');
+  var d2 = riEntry('d2', 'Poder de decisión');
+  var d3 = riEntry('d3', 'Disposición a agendar');
+
+  var hours = parseFloat(val('hours_per_week')) || 0;
+
+  return {
+    empresa:        val('empresa'),
+    contacto:       val('contacto'),
+    email:          val('email'),
+    telefono:       val('telefono'),
+    rubro:          val('rubro'),
+    hours_per_week: hours,
+    phases: {
+      A: [a2.phase, a3.phase],
+      B: [b1.phase, b2.phase, b3.phase],
+      C: [c1.phase, c2.phase, c3.phase],
+      D: [d1.phase, d2.phase, d3.phase],
+    },
+    // Solo áreas de DEFICIENCIA OPERATIVA (A dolor, B cuellos, C madurez).
+    // Se excluye D (Intención) porque describe al comprador, no a la operación.
+    critical_items: [
+      a2.critical, a3.critical,
+      b1.critical, b2.critical, b3.critical,
+      c1.critical, c2.critical, c3.critical,
+    ],
+    session_id: getSessionId(),
+    hp: val('hp-website'),
+  };
+}
+
+/* ── Formato ARS ─────────────────────────────────────────────────────────── */
+function formatARS(n) {
+  // Ej: 4032000 → "$4.032.000"
+  var str = Math.round(n).toString();
+  var result = '';
+  var count = 0;
+  for (var i = str.length - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) result = '.' + result;
+    result = str[i] + result;
+    count++;
+  }
+  return '$' + result;
+}
+
+/* ── Envío ───────────────────────────────────────────────────────────────── */
+async function submitForm() {
+  if (!validate(6)) return;
+
+  var btn = document.getElementById('btn-enviar');
+  if (btn) { btn.disabled = true; btn.textContent = 'Procesando…'; }
+
+  var data = buildPayload();
+
+  // Loading full-page
+  var topBarHTML = document.querySelector('.top-bar').outerHTML;
+  document.body.innerHTML =
+    topBarHTML +
+    '<div class="loading-page">' +
+      '<div class="spinner"></div>' +
+      '<div class="loading-title">Calculando tu IOI®...</div>' +
+      '<div class="loading-sub">Estamos analizando tu operación y preparando el diagnóstico</div>' +
+    '</div>' +
+    '<div class="glow glow--a"></div>' +
+    '<div class="glow glow--b"></div>';
+
+  // Actualizar barra a 95%
+  var pb = document.getElementById('pbar');
+  if (pb) pb.style.width = '95%';
+
+  try {
+    var res = await fetch('diagnostico2.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    var json;
+    try {
+      json = await res.json();
+    } catch(parseErr) {
+      renderError('No pudimos leer la respuesta del servidor. Nuestro equipo se comunicará con vos a la brevedad.');
+      return;
+    }
+
+    if (!res.ok || json.error) {
+      var msg = (json && json.error && typeof json.error === 'string')
+        ? json.error
+        : 'Ocurrió un error al procesar el diagnóstico. Recibimos tus datos igual y te contactaremos pronto.';
+      renderError(msg);
+      return;
+    }
+
+    renderResult(json);
+
+  } catch(networkErr) {
+    renderError('Error de conexión. Verificá tu internet y volvé a intentarlo, o escribinos por WhatsApp.');
+  }
+}
+
+/* ── Render de error ─────────────────────────────────────────────────────── */
+function renderError(msg) {
+  document.body.innerHTML =
+    '<div class="glow glow--a"></div>' +
+    '<div class="glow glow--b"></div>' +
+    '<div class="top-bar">' +
+      '<div class="top-bar__inner">' +
+        '<a class="brand" href="../../index.html">infouno<b>.ia</b></a>' +
+        '<div class="prog-wrap"><div class="prog-bar" style="width:100%"></div></div>' +
+        '<div class="prog-label">Error</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="result-section">' +
+      '<div class="wrap">' +
+        '<div class="err-box" id="err-msg"></div>' +
+        '<div style="margin-top:24px;text-align:center">' +
+          '<a class="btn btn-ghost" href="metodo-dos-nivel2.html">Volver a intentarlo</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  // textContent para datos del backend — regla de seguridad XSS
+  var errEl = document.getElementById('err-msg');
+  if (errEl) errEl.textContent = msg;
+}
+
+/* ── Render de resultado ─────────────────────────────────────────────────── */
+function renderResult(json) {
+  var ioi       = json.ioi_final || 0;
+  var veredicto = json.veredicto || {};
+  var costo     = json.costo_inaccion || {};
+  var fases     = json.fases || {};
+  var criticos  = json.puntos_criticos || [];
+  var narrativo = json.narrativo || null;
+
+  // HTML estructural (sin datos del backend dentro del string)
+  document.body.innerHTML =
+    '<div class="glow glow--a"></div>' +
+    '<div class="glow glow--b"></div>' +
+    '<div class="top-bar">' +
+      '<div class="top-bar__inner">' +
+        '<a class="brand" href="../../index.html">infouno<b>.ia</b></a>' +
+        '<div class="prog-wrap"><div class="prog-bar" style="width:100%"></div></div>' +
+        '<div class="prog-label">Resultado</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="result-section">' +
+      '<div class="wrap">' +
+
+        '<!-- IOI® hero -->' +
+        '<div class="ioi-hero">' +
+          '<div class="ioi-score-wrap">' +
+            '<div class="ioi-label">Tu Índice de Oportunidad Infouno (IOI®)</div>' +
+            '<div class="ioi-number" id="ioi-num"></div>' +
+            '<div class="ioi-verdict-title" id="ioi-titulo"></div>' +
+            '<div class="ioi-verdict-msg" id="ioi-mensaje"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Costo de inacción -->' +
+        '<div class="result-card">' +
+          '<div class="result-card-title">Costo estimado de la inacción</div>' +
+          '<div class="costo-grid">' +
+            '<div class="costo-item">' +
+              '<div class="costo-item-label">Horas semanales perdidas</div>' +
+              '<div class="costo-item-val" id="costo-horas"></div>' +
+            '</div>' +
+            '<div class="costo-item">' +
+              '<div class="costo-item-label">Costo anual estimado</div>' +
+              '<div class="costo-item-val" id="costo-anual"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Fases -->' +
+        '<div class="result-card">' +
+          '<div class="result-card-title">Puntaje por dimensión</div>' +
+          '<div class="fases-bar-wrap">' +
+            '<div class="fase-row"><div class="fase-label">A · Tareas manuales e ineficiencia</div><div class="fase-track"><div class="fase-fill" id="fase-a" style="width:0%"></div></div><div class="fase-score" id="fase-a-n"></div></div>' +
+            '<div class="fase-row"><div class="fase-label">B · Volumen de operación</div><div class="fase-track"><div class="fase-fill" id="fase-b" style="width:0%"></div></div><div class="fase-score" id="fase-b-n"></div></div>' +
+            '<div class="fase-row"><div class="fase-label">C · Madurez digital</div><div class="fase-track"><div class="fase-fill" id="fase-c" style="width:0%"></div></div><div class="fase-score" id="fase-c-n"></div></div>' +
+            '<div class="fase-row"><div class="fase-label">D · Intención / Acción</div><div class="fase-track"><div class="fase-fill" id="fase-d" style="width:0%"></div></div><div class="fase-score" id="fase-d-n"></div></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Puntos críticos -->' +
+        '<div class="result-card">' +
+          '<div class="result-card-title">Tus 3 puntos críticos</div>' +
+          '<ul class="criticos-list" id="criticos-list"></ul>' +
+        '</div>' +
+
+        '<!-- Narrativo LLM (si existe) -->' +
+        '<div class="result-card" id="narrativo-card" style="display:none">' +
+          '<div class="result-card-title">Análisis personalizado</div>' +
+          '<div class="narrativo-content" id="narrativo-text"></div>' +
+        '</div>' +
+
+        '<!-- CTA -->' +
+        '<div class="cta-row">' +
+          (AGENDA_URL ?
+            '<a class="btn btn-cal" href="' + AGENDA_URL + '" target="_blank" rel="noopener">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>' +
+              'Turno para videollamada' +
+            '</a>'
+          : '') +
+          '<a class="btn btn-wa" href="https://wa.me/5491100000000?text=Hice%20el%20diagn%C3%B3stico%20M%C3%A9todo%20DOS%C2%AE%20y%20quiero%20hablar%20sobre%20mi%20IOI%C2%AE" target="_blank" rel="noopener">' +
+            '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>' +
+            'Hablar con un consultor' +
+          '</a>' +
+        '</div>' +
+
+      '</div>' +
+    '</div>';
+
+  // ── Poblar datos con textContent (NUNCA innerHTML para datos del backend) ──
+
+  // IOI® número
+  var ioiNumEl = document.getElementById('ioi-num');
+  if (ioiNumEl) {
+    // Construimos: número grande + "/100" pequeño
+    var span = document.createElement('span');
+    span.textContent = String(ioi);
+    var small = document.createElement('span');
+    small.className = 'ioi-max';
+    small.textContent = '/100';
+    ioiNumEl.appendChild(span);
+    ioiNumEl.appendChild(small);
+  }
+
+  // Veredicto
+  var tituloEl  = document.getElementById('ioi-titulo');
+  var mensajeEl = document.getElementById('ioi-mensaje');
+  if (tituloEl)  tituloEl.textContent  = veredicto.titulo  || '';
+  if (mensajeEl) mensajeEl.textContent = veredicto.mensaje || '';
+
+  // Costo de inacción
+  var horasEl  = document.getElementById('costo-horas');
+  var anualEl  = document.getElementById('costo-anual');
+  var horasVal = costo.horas_semanales !== undefined ? costo.horas_semanales : 0;
+  var anualVal = costo.anual_ars !== undefined ? costo.anual_ars : 0;
+  if (horasEl) horasEl.textContent = horasVal + ' h/sem';
+  if (anualEl) anualEl.textContent = formatARS(anualVal) + ' ARS';
+
+  // Fases — barras animadas (timeout para que el browser pinte el DOM primero)
+  setTimeout(function() {
+    var faseDefs = [
+      { fill: 'fase-a', num: 'fase-a-n', key: 'A' },
+      { fill: 'fase-b', num: 'fase-b-n', key: 'B' },
+      { fill: 'fase-c', num: 'fase-c-n', key: 'C' },
+      { fill: 'fase-d', num: 'fase-d-n', key: 'D' },
+    ];
+    faseDefs.forEach(function(fd) {
+      var score = fases[fd.key] !== undefined ? fases[fd.key] : 0;
+      var fillEl = document.getElementById(fd.fill);
+      var numEl  = document.getElementById(fd.num);
+      if (fillEl) fillEl.style.width = score + '%';
+      if (numEl)  numEl.textContent  = score;
+    });
+  }, 80);
+
+  // Puntos críticos
+  var criticosList = document.getElementById('criticos-list');
+  if (criticosList && Array.isArray(criticos) && criticos.length > 0) {
+    criticos.forEach(function(item) {
+      var li = document.createElement('li');
+      li.textContent = typeof item === 'string' ? item : '';
+      criticosList.appendChild(li);
+    });
+  } else if (criticosList) {
+    var li = document.createElement('li');
+    li.textContent = 'No se detectaron puntos críticos significativos.';
+    criticosList.appendChild(li);
+  }
+
+  // Narrativo LLM (opcional, puede ser null)
+  var narrativoCard = document.getElementById('narrativo-card');
+  var narrativoText = document.getElementById('narrativo-text');
+  if (narrativo && typeof narrativo === 'string' && narrativo.trim() !== '') {
+    if (narrativoText) narrativoText.textContent = narrativo;
+    if (narrativoCard) narrativoCard.style.display = 'block';
+  }
+  // Si narrativo es null simplemente no se muestra el card (display:none por defecto)
+}
+</script>
+</body>
+</html>
