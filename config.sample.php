@@ -22,18 +22,21 @@ return [
   'notify_email' => 'ventas@infouno.com.ar',     // a dónde llegan los avisos
   'from_email'   => 'no-reply@infouno.com.ar',   // remitente (mejor un buzón de tu dominio)
 
-  // --- Agente conversacional (LLM con function calling) ---
-  // El bot funciona con cualquier API compatible con OpenAI Chat Completions que soporte
-  // tool calling. Pegá la API key SOLO acá, en el server. Si queda vacía, el bot usa el guion.
-  'openai_key'   => '',              // la key del proveedor que apunte 'api_base' (sk-... o AIza...)
+  // --- Motor de IA (LLM) — COMPARTIDO por el bot (chat.php), Método UNO y Método DOS ---
   //
-  // 'api_base' define a qué proveedor se llama. Ejemplos:
-  //   OpenAI  → 'https://api.openai.com/v1/chat/completions'              + model 'gpt-4o-mini'
-  //   Gemini  → 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' + model 'gemini-2.5-flash'
-  // Si lo dejás vacío, usa OpenAI por defecto.
-  'api_base'     => 'https://api.openai.com/v1/chat/completions',
-  'openai_model' => 'gpt-4o-mini',   // OpenAI: 'gpt-4o-mini' / 'gpt-4o' · Gemini: 'gemini-2.5-flash'
-  'chat_enabled' => true,            // false = forzar el guion scripteado
+  // ⚠️ IMPORTANTE sobre el nombre "openai_*": estas claves se llaman así porque el código
+  // usa el FORMATO de OpenAI (Chat Completions), NO porque uses OpenAI. Funcionan con
+  // CUALQUIER proveedor compatible con OpenAI. El proveedor real lo define 'api_base':
+  //   • OpenAI  → api_base 'https://api.openai.com/v1/chat/completions'                       + openai_model 'gpt-4o-mini'
+  //   • Gemini  → api_base 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' + openai_model 'gemini-2.5-flash'
+  //
+  // Pegá UNA sola API key acá (la comparten los tres). Va SOLO en el server, nunca en el
+  // frontend. Si queda vacía, el bot cae al guion scripteado (y UNO/DOS no generan el texto).
+  // Los valores de abajo apuntan a GEMINI, que es lo que usa el sitio hoy.
+  'openai_key'   => '',              // key del proveedor de 'api_base' (Gemini o OpenAI 'sk-...')
+  'api_base'     => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+  'openai_model' => 'gemini-2.5-flash',   // debe coincidir con el proveedor de 'api_base'
+  'chat_enabled' => true,            // false = forzar el guion scripteado (sin IA)
 
   // --- Rate limiting de chat.php (anti-abuso del endpoint pago, hallazgo H1) ---
   // Si se omiten, usan los defaults. Subí/bajá según tu gasto y tráfico real.
