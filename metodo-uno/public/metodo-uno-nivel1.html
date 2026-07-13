@@ -459,6 +459,49 @@
       .thankyou-card { padding: 24px 20px; }
       .diag-card { padding: 20px 18px; }
     }
+
+    /* ── Descargar en PDF ─────────────────────────────────────────────────── */
+    /* Sin librerías: el botón dispara window.print() y el navegador ofrece
+       "Guardar como PDF". Texto real (seleccionable), no una imagen. */
+    .pdf-actions { text-align: center; margin-top: 24px; }
+    .pdf-head    { display: none; }   /* portada: solo existe en el PDF impreso */
+
+    @media print {
+      @page { margin: 16mm; }
+
+      /* El sitio es oscuro. En vez de pisar selector por selector (frágil: reglas como
+         "h1,h2,h3,h4 { color: var(--ink) }" ganan por especificidad), redefinimos los
+         tokens: toda regla que los use pasa sola a tinta oscura sobre blanco. */
+      :root {
+        --bg: #fff;  --bg-2: #fff;  --panel: #fff;  --panel-2: #fff;  --panel-3: #fff;
+        --ink: #111; --text: #222;  --muted: #555;
+        --line: #ddd; --line-2: #ccc; --line-3: #ccc;
+        --acc: #111; --acc-2: #111; --acc-deep: #111;
+        --acc-soft: #f2f2f2; --acc-line: #ccc;
+        --grad: #111; --shadow: none;
+      }
+      html, body { background: #fff; color: #222; }
+
+      /* Cromo de pantalla que no va al PDF. */
+      .glow, .top-bar, .steps-track, .proceso-title,
+      .no-print, .pdf-actions, .err-box { display: none !important; }
+
+      .pdf-head {
+        display: block; margin-bottom: 22px;
+        border-bottom: 2px solid #111; padding-bottom: 12px;
+      }
+      .pdf-head .pdf-brand { font-size: 1.15rem; font-weight: 700; color: #111; }
+      .pdf-head .pdf-doc   { font-size: .95rem; font-weight: 600; margin-top: 6px; color: #111; }
+      .pdf-head .pdf-meta  { font-size: .8rem; color: #555; margin-top: 4px; }
+
+      .proceso-section { padding: 0 !important; }
+      .wrap { max-width: 100% !important; padding: 0 !important; }
+
+      /* Que una tarjeta no se parta al medio entre dos páginas. */
+      .thankyou-card, .diag-card { break-inside: avoid; box-shadow: none !important; }
+      .diag-content { font-size: .92rem; }
+      a { color: #111 !important; text-decoration: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -822,15 +865,15 @@ async function submitForm() {
       body: JSON.stringify(data),
     });
     const json = await res.json();
-    renderThankYou(json.diagnostico ?? null, json.error ?? null);
+    renderThankYou(json.diagnostico ?? null, json.error ?? null, data);
   } catch (e) {
-    renderThankYou(null, 'Error de conexión. El equipo de Infouno se comunicará con vos a la brevedad.');
+    renderThankYou(null, 'Error de conexión. El equipo de Infouno se comunicará con vos a la brevedad.', data);
   }
 }
 
 const PASOS = [['①','Descubrir'],['②','Diagnosticar'],['③','Diseñar'],['④','Construir'],['⑤','Potenciar']];
 
-function renderThankYou(diagnostico, error) {
+function renderThankYou(diagnostico, error, data) {
   const stepsHTML = PASOS.map(([num, name], i) => `
     <div class="step-row ${i === 1 ? 'step-active' : ''}">
       <div class="step-num">${num}</div>
@@ -839,10 +882,27 @@ function renderThankYou(diagnostico, error) {
     ${i < PASOS.length - 1 ? `<div class="step-connector"><div class="step-line-dot"><div class="step-line-inner"></div></div><div></div></div>` : ''}
   `).join('');
 
+  const empresa = (data && data.empresa) ? data.empresa : '';
+  const fecha   = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  // El navegador usa el <title> como nombre sugerido del PDF.
+  if (diagnostico) document.title = 'Diagnostico Metodo UNO' + (empresa ? ' - ' + empresa : '');
+
+  // Portada: oculta en pantalla, visible solo en el PDF (ver @media print).
+  const headHTML = diagnostico ? `
+    <div class="pdf-head">
+      <div class="pdf-brand">infouno.ia</div>
+      <div class="pdf-doc">Diagnóstico Método UNO® — Nivel 1</div>
+      <div class="pdf-meta">${empresa ? esc(empresa) + ' · ' : ''}${fecha}</div>
+    </div>` : '';
+
   const diagHTML = diagnostico ? `
     <div class="diag-card">
       <h3>Resumen de diagnóstico preliminar</h3>
       <div class="diag-content">${esc(diagnostico)}</div>
+    </div>
+    <div class="pdf-actions">
+      <button class="btn btn-primary" id="btn-pdf" type="button">Descargar diagnóstico en PDF</button>
     </div>` : '';
 
   const errHTML = error ? `<div class="err-box" style="display:block">${esc(error)}</div>` : '';
@@ -859,7 +919,8 @@ function renderThankYou(diagnostico, error) {
     </div>
     <div class="proceso-section">
       <div class="wrap">
-        <div style="text-align:center;margin-bottom:36px">
+        ${headHTML}
+        <div class="no-print" style="text-align:center;margin-bottom:36px">
           <div class="success-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="#7AB317" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
@@ -879,6 +940,10 @@ function renderThankYou(diagnostico, error) {
         ${errHTML}
       </div>
     </div>`;
+
+  // Listener (no inline onclick: la CSP del sitio solo admite scripts propios).
+  const btnPdf = document.getElementById('btn-pdf');
+  if (btnPdf) btnPdf.addEventListener('click', () => window.print());
 }
 
 function esc(s) {

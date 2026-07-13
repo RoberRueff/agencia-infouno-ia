@@ -455,6 +455,57 @@
       .result-card { padding: 18px 18px; }
       .ioi-score-wrap { padding: 24px 28px; }
     }
+
+    /* ── Descargar en PDF ─────────────────────────────────────────────────── */
+    /* Sin librerías: el botón dispara window.print() y el navegador ofrece
+       "Guardar como PDF". Texto real (seleccionable), no una imagen. */
+    .pdf-actions { text-align: center; margin-top: 8px; }
+    .pdf-head    { display: none; }   /* portada: solo existe en el PDF impreso */
+
+    @media print {
+      @page { margin: 16mm; }
+
+      /* El sitio es oscuro. En vez de pisar selector por selector (frágil: reglas como
+         "h1,h2,h3,h4 { color: var(--ink) }" ganan por especificidad), redefinimos los
+         tokens: toda regla que los use pasa sola a tinta oscura sobre blanco. */
+      :root {
+        --bg: #fff;  --bg-2: #fff;  --panel: #fff;  --panel-2: #fff;  --panel-3: #fff;
+        --ink: #111; --text: #222;  --muted: #555;
+        --line: #ddd; --line-2: #ccc; --line-3: #ccc;
+        --acc: #111; --acc-2: #111; --acc-deep: #111;
+        --acc-soft: #f2f2f2; --acc-line: #ccc;
+        --grad: #111; --shadow: none;
+      }
+      html, body { background: #fff; color: #222; }
+
+      /* Cromo de pantalla que no va al PDF. */
+      .glow, .top-bar, .cta-row, .no-print, .pdf-actions { display: none !important; }
+
+      .pdf-head {
+        display: block; margin-bottom: 22px;
+        border-bottom: 2px solid #111; padding-bottom: 12px;
+      }
+      .pdf-head .pdf-brand { font-size: 1.15rem; font-weight: 700; color: #111; }
+      .pdf-head .pdf-doc   { font-size: .95rem; font-weight: 600; margin-top: 6px; color: #111; }
+      .pdf-head .pdf-meta  { font-size: .8rem; color: #555; margin-top: 4px; }
+
+      .result-section { padding: 0 !important; }
+      .wrap { max-width: 100% !important; padding: 0 !important; }
+
+      /* Que una tarjeta no se parta al medio entre dos páginas. */
+      .ioi-hero, .result-card { break-inside: avoid; box-shadow: none !important; }
+      .ioi-score-wrap, .costo-item, .criticos-list li { box-shadow: none !important; }
+
+      /* Las barras de puntaje son degradados: en papel, tinta sólida.
+         print-color-adjust obliga al navegador a imprimir el relleno igual. */
+      .fase-track { background: #e5e5e5 !important; }
+      .fase-fill  {
+        background: #111 !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+
+      a { color: #111 !important; text-decoration: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -1122,7 +1173,7 @@ async function submitForm() {
       return;
     }
 
-    renderResult(json);
+    renderResult(json, data);
 
   } catch(networkErr) {
     renderError('Error de conexión. Verificá tu internet y volvé a intentarlo, o escribinos por WhatsApp.');
@@ -1156,13 +1207,19 @@ function renderError(msg) {
 }
 
 /* ── Render de resultado ─────────────────────────────────────────────────── */
-function renderResult(json) {
+function renderResult(json, data) {
   var ioi       = json.ioi_final || 0;
   var veredicto = json.veredicto || {};
   var costo     = json.costo_inaccion || {};
   var fases     = json.fases || {};
   var criticos  = json.puntos_criticos || [];
   var narrativo = json.narrativo || null;
+
+  var empresa = (data && data.empresa) ? data.empresa : '';
+  var fecha   = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  // El navegador usa el <title> como nombre sugerido del PDF.
+  document.title = 'Diagnostico Metodo DOS - IOI' + (empresa ? ' - ' + empresa : '');
 
   // HTML estructural (sin datos del backend dentro del string)
   document.body.innerHTML =
@@ -1177,6 +1234,13 @@ function renderResult(json) {
     '</div>' +
     '<div class="result-section">' +
       '<div class="wrap">' +
+
+        // Portada: oculta en pantalla, visible solo en el PDF (ver @media print).
+        '<div class="pdf-head">' +
+          '<div class="pdf-brand">infouno.ia</div>' +
+          '<div class="pdf-doc">Diagnóstico Método DOS® — Nivel 2 (IOI®)</div>' +
+          '<div class="pdf-meta" id="pdf-meta"></div>' +
+        '</div>' +
 
         '<!-- IOI® hero -->' +
         '<div class="ioi-hero">' +
@@ -1240,8 +1304,20 @@ function renderResult(json) {
           '</a>' +
         '</div>' +
 
+        '<div class="pdf-actions">' +
+          '<button class="btn btn-ghost" id="btn-pdf" type="button">Descargar diagnóstico en PDF</button>' +
+        '</div>' +
+
       '</div>' +
     '</div>';
+
+  // Empresa/fecha del encabezado del PDF: textContent, nunca innerHTML.
+  var metaEl = document.getElementById('pdf-meta');
+  if (metaEl) metaEl.textContent = (empresa ? empresa + ' · ' : '') + fecha;
+
+  // Listener (no inline onclick: la CSP del sitio solo admite scripts propios).
+  var btnPdf = document.getElementById('btn-pdf');
+  if (btnPdf) btnPdf.addEventListener('click', function () { window.print(); });
 
   // ── Poblar datos con textContent (NUNCA innerHTML para datos del backend) ──
 
