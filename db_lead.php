@@ -23,7 +23,60 @@ if (!function_exists('nn')) {
 }
 
 /**
+ * Arma y envía el aviso de lead por email. Lo usan los dos caminos: el normal (lead ya
+ * guardado) y el degradado ($degraded = la DB no respondió, así que este mail es el ÚNICO
+ * registro del lead). Devuelve true si mail() aceptó el mensaje.
+ */
+function infouno_notify_lead($cfg, $c, $degraded = false) {
+  $subject = ($degraded ? '[LEAD SIN GUARDAR] ' : ($c['vip'] ? '[LEAD VIP] ' : '[Lead] '))
+    . ($c['name'] !== '' ? $c['name'] : 'Nuevo contacto')
+    . ($c['rubro'] !== '' ? ' — ' . $c['rubro'] : '');
+
+  $lines = [
+    'Nombre:        ' . $c['name'],
+    'Rubro/Interés: ' . $c['rubro'],
+    'Empresa:       ' . $c['company'],
+    'WhatsApp:      ' . $c['phone'],
+    'Email:         ' . $c['email'],
+    'Web:           ' . $c['webTxt'],
+    'Equipo:        ' . $c['eqTxt'],
+    'Scoring:       ' . $c['score'] . ($c['vip'] ? '  (VIP)' : ''),
+    'Origen:        ' . $c['source'] . ' · ' . $c['page'],
+    'UTM:           ' . trim($c['utm_s'] . ' / ' . $c['utm_m'] . ' / ' . $c['utm_c'], ' /'),
+    'Mensaje:       ' . $c['message'],
+  ];
+  if ($degraded) {
+    array_unshift($lines,
+      '*** LA BASE DE DATOS NO RESPONDIÓ — ESTE LEAD NO QUEDÓ GUARDADO ***',
+      'Este email es el único registro. Cargalo a mano en wp_infouno_leads si hace falta.',
+      'session_id: ' . $c['session'],
+      ''
+    );
+  }
+
+  $headers = 'From: ' . $cfg['from_email'] . "\r\n" . 'Content-Type: text/plain; charset=utf-8';
+  return @mail($cfg['notify_email'], $subject, implode("\n", $lines), $headers);
+}
+
+/**
+ * Candado de "ya avisamos por esta sesión" para el camino degradado: sin DB no podemos
+ * leer lead_notified, y el bot llama a save_lead en cada paso (nos llenaría la casilla).
+ * Archivo por sesión fuera del webroot, igual que ratelimit.php. Modo 'x' = creación
+ * atómica, así dos requests simultáneos no mandan dos mails.
+ * Si el temp dir no fuese escribible, preferimos avisar de más antes que perder el lead.
+ */
+function infouno_mail_once($session) {
+  $dir = sys_get_temp_dir() . '/infouno_leadmail';
+  if (!is_dir($dir)) @mkdir($dir, 0700, true);
+  $file = $dir . '/' . md5($session) . '.txt';
+  if (is_file($file)) return false;
+  if ($fh = @fopen($file, 'x')) { fwrite($fh, '1'); fclose($fh); return true; }
+  return !is_file($file);
+}
+
+/**
  * Guarda/actualiza un lead por session_id. Devuelve ['ok'=>bool,'vip'=>int,'scoring'=>int].
+ * Si la DB no está disponible, el lead NO se pierde: sale por email (ver infouno_notify_lead).
  */
 function infouno_save_lead($cfg, $in) {
   $session = s($in['session_id'] ?? '', 64);
@@ -75,18 +128,39 @@ function infouno_save_lead($cfg, $in) {
   if ($phoneValid)                $score += 20;
   $vip = ($infra === 'has_web' && $size === 'team_large') ? 1 : 0;
 
+  // ¿El lead tiene sustancia como para avisar? Contacto válido + identidad (nombre o rubro),
+  // así el bot no notifica en pasos parciales. El form siempre avisa (coordina por WhatsApp).
+  // Se calcula ANTES de la conexión: el camino degradado también lo necesita.
+  $hasIdentity = ($name !== '' || $rubro !== '');
+  $actionable  = ($source === 'form') || (($phoneValid || $emailValid) && $hasIdentity);
+
+  // Datos del aviso, armados una sola vez para los dos caminos (DB OK y DB caída).
+  $ctx = [
+    'session' => $session, 'name'  => $name,  'rubro'  => $rubro,  'company' => $company,
+    'phone'   => $phone,   'email' => $email, 'webTxt' => $webTxt, 'eqTxt'   => $eqTxt,
+    'score'   => $score,   'vip'   => $vip,   'source' => $source, 'page'    => $page,
+    'utm_s'   => $utm_s,   'utm_m' => $utm_m, 'utm_c'  => $utm_c,  'message' => $message,
+  ];
+
   // Conexión
   $db = @new mysqli($cfg['db_host'], $cfg['db_user'], $cfg['db_pass'], $cfg['db_name']);
   if ($db->connect_errno) {
     @error_log('infouno DB connect: (' . $db->connect_errno . ') ' . $db->connect_error);
-    return ['ok' => false, 'error' => 'db'];
+    // Sin DB el lead se perdería entero (no llegaba ni el mail). Lo mandamos por email.
+    $mailed = ($actionable && infouno_mail_once($session)) ? infouno_notify_lead($cfg, $ctx, true) : false;
+    return ['ok' => false, 'error' => 'db', 'mailed' => (bool) $mailed];
   }
   $db->set_charset('utf8mb4');
 
   // ¿Ya existe? (para no notificar dos veces: email y WhatsApp por separado)
   $notified = 0; $vipNotified = 0;
   $q = $db->prepare('SELECT lead_notified, lead_vip_notified FROM wp_infouno_leads WHERE session_id = ? LIMIT 1');
-  if (!$q) { $db->close(); return ['ok' => false, 'error' => 'db']; }
+  if (!$q) {
+    @error_log('infouno DB select prepare: ' . $db->error);
+    $db->close();
+    $mailed = ($actionable && infouno_mail_once($session)) ? infouno_notify_lead($cfg, $ctx, true) : false;
+    return ['ok' => false, 'error' => 'db', 'mailed' => (bool) $mailed];
+  }
   $q->bind_param('s', $session);
   $q->execute();
   if ($r = $q->get_result()->fetch_assoc()) { $notified = (int) $r['lead_notified']; $vipNotified = (int) $r['lead_vip_notified']; }
@@ -120,7 +194,12 @@ function infouno_save_lead($cfg, $in) {
      lead_vip            = GREATEST(lead_vip, VALUES(lead_vip))';
 
   $stmt = $db->prepare($sql);
-  if (!$stmt) { $db->close(); return ['ok' => false, 'error' => 'db']; }
+  if (!$stmt) {
+    @error_log('infouno DB insert prepare: ' . $db->error);
+    $db->close();
+    $mailed = ($actionable && infouno_mail_once($session)) ? infouno_notify_lead($cfg, $ctx, true) : false;
+    return ['ok' => false, 'error' => 'db', 'mailed' => (bool) $mailed];
+  }
   $stmt->bind_param(
     'ssssssssssssssii',
     $session, $vName, $vRubro, $vCompany, $vMessage, $infra, $size, $vPhone, $vEmail,
@@ -130,28 +209,16 @@ function infouno_save_lead($cfg, $in) {
   if (!$ok) @error_log('infouno DB insert: ' . $stmt->error);
   $stmt->close();
 
-  // Notificación por email (una sola vez). Solo cuando el lead tiene sustancia:
-  // contacto válido + identidad (nombre o rubro), para no avisar en pasos parciales
-  // del bot. El form siempre notifica (coordina por WhatsApp, sin tel/email guardado).
-  $hasIdentity = ($name !== '' || $rubro !== '');
-  $actionable = ($source === 'form') || (($phoneValid || $emailValid) && $hasIdentity);
-  if ($ok && $actionable && !$notified) {
-    $subject = ($vip ? '[LEAD VIP] ' : '[Lead] ') . ($name !== '' ? $name : 'Nuevo contacto') . ($rubro !== '' ? ' — ' . $rubro : '');
-    $body = implode("\n", [
-      'Nombre:        ' . $name,
-      'Rubro/Interés: ' . $rubro,
-      'Empresa:       ' . $company,
-      'WhatsApp:      ' . $phone,
-      'Email:         ' . $email,
-      'Web:           ' . $webTxt,
-      'Equipo:        ' . $eqTxt,
-      'Scoring:       ' . $score . ($vip ? '  (VIP)' : ''),
-      'Origen:        ' . $source . ' · ' . $page,
-      'UTM:           ' . trim($utm_s . ' / ' . $utm_m . ' / ' . $utm_c, ' /'),
-      'Mensaje:       ' . $message,
-    ]);
-    $headers = 'From: ' . $cfg['from_email'] . "\r\n" . 'Content-Type: text/plain; charset=utf-8';
-    @mail($cfg['notify_email'], $subject, $body, $headers);
+  // El INSERT falló pese a haber conectado: el lead tampoco quedó guardado → email degradado.
+  if (!$ok) {
+    $db->close();
+    $mailed = ($actionable && infouno_mail_once($session)) ? infouno_notify_lead($cfg, $ctx, true) : false;
+    return ['ok' => false, 'error' => 'db', 'mailed' => (bool) $mailed];
+  }
+
+  // Notificación por email (una sola vez; el candado acá es lead_notified, que sí podemos leer).
+  if ($actionable && !$notified) {
+    infouno_notify_lead($cfg, $ctx, false);
 
     if ($u = $db->prepare('UPDATE wp_infouno_leads SET lead_notified = 1 WHERE session_id = ?')) {
       $u->bind_param('s', $session);
@@ -162,7 +229,7 @@ function infouno_save_lead($cfg, $in) {
 
   // Alerta de lead VIP por WhatsApp (vía Make). Best-effort, NO bloqueante: nunca
   // demora ni rompe el guardado. Solo VIP + accionable, una sola vez por lead.
-  if ($ok && $vip && $actionable && !$vipNotified && !empty($cfg['make_webhook_url'])) {
+  if ($vip && $actionable && !$vipNotified && !empty($cfg['make_webhook_url'])) {
     $waLink = $phoneValid ? ('https://wa.me/' . $phone) : '';
     $payload = json_encode([
       'token'      => $cfg['make_token'] ?? '',
