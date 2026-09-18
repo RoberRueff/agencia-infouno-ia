@@ -1,0 +1,37 @@
+RewriteEngine On
+
+# Fuerza HTTPS antes que cualquier otra regla. %{HTTPS} lo pone Apache/cPanel;
+# si el sitio está detrás de un proxy que solo reenvía X-Forwarded-Proto,
+# agregar también: RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Si el document root apunta a esta carpeta (raíz del proyecto) en vez de a
+# public/ directamente —caso típico cuando el proyecto vive en una subcarpeta
+# de un sitio existente, ej. infouno.com.ar/cartera/—, esto redirige todo el
+# tráfico web hacia public/ sin asumir en qué subcarpeta está: %{REQUEST_URI}
+# ya trae el prefijo (ej. /cartera/algo), así que solo insertamos "public/"
+# después de la carpeta del proyecto en vez de armar una ruta absoluta fija.
+RewriteCond %{REQUEST_URI} !/public/
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Headers de seguridad (aplican si el document root apunta a esta carpeta raíz;
+# el mismo bloque está en public/.htaccess para el caso recomendado).
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "\.(sql|md)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "\.(sql|md)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>

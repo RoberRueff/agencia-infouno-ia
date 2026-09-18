@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Fuerza HTTPS. Si el document root de cPanel apunta directo a esta carpeta
+# (la configuración recomendada en ../README.md), esta es la regla que aplica.
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Headers de seguridad. HSTS solo tiene efecto sobre HTTPS (el navegador lo
+# ignora sobre HTTP). SAMEORIGIN evita que el panel/landing se embeban en un
+# iframe ajeno (clickjacking); nosniff evita adivinar el content-type.
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

@@ -1,0 +1,18 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /dashboard.php
+Disallow: /login.php
+Disallow: /logout.php
+Disallow: /recuperar.php
+Disallow: /lead_capture.php
+Disallow: /webhook_whatsapp.php
+
+# landing.php y privacidad.php NO se bloquean acá a propósito: llevan su
+# propio <meta name="robots" content="noindex, ...">, y para que Google lo
+# respete necesita poder rastrear la página. Bloquearlas en robots.txt le
+# impediría ver esa etiqueta y podría igual indexar la URL sin snippet.
+# Ver ai/seo-taxonomy.md.
+
+# Sitemap: agregar acá la línea "Sitemap: https://balanzassip.com.ar/sitemap.xml"
+# cuando existan páginas de contenido indexables (/roas-para-pymes/, /glosario/...).
+# Hoy no hay ninguna, así que todavía no corresponde.
