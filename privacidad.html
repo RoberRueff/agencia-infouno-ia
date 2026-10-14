@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18453126520"></script>
+<!-- Consent Mode v2: debe ir ANTES de cualquier tag de Google. Todo denegado hasta que el usuario acepte (site.js). -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18453126520');
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied', wait_for_update:500});
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +25,9 @@
 <meta name="twitter:description" content="Política de privacidad y protección de datos personales de Infouno, en conformidad con la Ley N° 25.326 de Argentina.">
 <meta name="twitter:image" content="https://infouno.com.ar/assets/logo.png">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -36,8 +36,6 @@
   <div class="wrap nav__row">
     <a class="brand" href="index.html"><img src="assets/logo.png" alt="Infouno"><span>info<b>uno</b><span class="brand__ia">.ia</span></span></a>
     <nav class="nav__links">
-      <a href="servicios.html">Diseños con IA</a>
-      <a href="soluciones-ia.html">Automatización de Procesos</a>
       <a href="metodo-uno/public/metodo-uno-nivel1.html" style="color:var(--acc-2);display:inline-flex;align-items:center;gap:6px">
         <span style="width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px 1px var(--acc);flex-shrink:0"></span>
         Diagnóstico IA
@@ -86,13 +84,19 @@
       <h2 class="h-3" style="margin-top:28px">5. Conservación y seguridad</h2>
       <p class="muted">Los datos se almacenan en una base de datos con acceso restringido y se conservan mientras dure la relación comercial o hasta que solicites su eliminación. Aplicamos medidas técnicas razonables (sanitización de entradas y consultas parametrizadas) para protegerlos.</p>
 
-      <h2 class="h-3" style="margin-top:28px">6. Tus derechos (Ley 25.326)</h2>
+      <h2 class="h-3" style="margin-top:28px">6. Cookies y medición</h2>
+      <p class="muted">Usamos cookies de medición y publicidad de Google (Google Analytics 4 y Google Ads) <b>solo si las aceptás</b> en el aviso de cookies. Mientras no aceptes, no se cargan ni se guardan. Podés rechazarlas sin perder ninguna funcionalidad del sitio, y cambiar tu decisión borrando los datos del sitio en tu navegador.</p>
+
+      <h2 class="h-3" style="margin-top:28px">7. Terceros que intervienen</h2>
+      <p class="muted">Para prestar el servicio usamos proveedores que pueden procesar datos fuera de Argentina: un proveedor de modelos de IA (Google Gemini u OpenAI) para generar las respuestas del asistente y los diagnósticos, Google (medición y publicidad), Cal.com (agenda) y herramientas de automatización para avisarnos de nuevos contactos. Les enviamos solo lo necesario para esa función.</p>
+
+      <h2 class="h-3" style="margin-top:28px">8. Tus derechos (Ley 25.326)</h2>
       <p class="muted">Como titular de los datos tenés derecho a <b>acceder, rectificar, actualizar y suprimir</b> tu información personal. Para ejercerlos, escribinos a <a href="mailto:ventas@infouno.com.ar">ventas@infouno.com.ar</a>. La <b>Agencia de Acceso a la Información Pública (AAIP)</b>, órgano de control de la Ley N° 25.326, atiende las denuncias y reclamos vinculados al incumplimiento de las normas sobre protección de datos personales.</p>
 
-      <h2 class="h-3" style="margin-top:28px">7. Cambios en esta política</h2>
+      <h2 class="h-3" style="margin-top:28px">9. Cambios en esta política</h2>
       <p class="muted">Podemos actualizar esta política para reflejar cambios legales o de nuestros servicios. La versión vigente estará siempre publicada en esta página.</p>
 
-      <p class="muted" style="margin-top:28px;font-size:.85rem;opacity:.7">Última actualización: junio de 2026.</p>
+      <p class="muted" style="margin-top:28px;font-size:.85rem;opacity:.7">Última actualización: octubre de 2026.</p>
 
       <div style="margin-top:28px">
         <a class="btn btn--ghost" href="contacto.html">← Volver a Contacto</a>
@@ -115,6 +119,6 @@
   <span>Escribinos</span>
 </a>
 
-<script src="assets/site.js"></script>
+<script src="assets/site.js" defer></script>
 </body>
 </html>

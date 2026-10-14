@@ -253,6 +253,7 @@ function infouno_save_lead($cfg, $in) {
       CURLOPT_POST           => true,
       CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
       CURLOPT_POSTFIELDS     => $payload,
+      CURLOPT_CONNECTTIMEOUT => 2,
       CURLOPT_TIMEOUT        => 3,
     ]);
     $resp = @curl_exec($ch);

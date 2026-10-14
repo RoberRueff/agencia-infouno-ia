@@ -29,9 +29,10 @@ Sitio corporativo + chatbot "Uno" para **captar y cualificar leads** de PyMEs ar
 | `assets/site.js` | Toda la lógica frontend: WhatsApp, calculadora ROI, bot "Uno" (IA + guion), agenda, leads, Tweaks. |
 | `chat.php` | Proxy del bot al LLM vía API compatible con OpenAI (OpenAI/Gemini según `api_base`); function calling + fallback. La API key vive solo aquí (vía `config.php`). |
 | `lead.php` / `db_lead.php` | Recepción y persistencia de leads (upsert por `session_id`, scoring/VIP, email). Si MySQL no responde, el lead **no se pierde**: se envía por email como `[LEAD SIN GUARDAR]` (deduplicado por sesión con un archivo en el temp dir). |
-| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`/`lead.php`/`diagnostico.php`/`diagnostico2.php`. Anti-spam de leads (honeypot + throttling). |
+| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`/`lead.php`/`diagnostico.php`/`diagnostico2.php`. Topes de entrada (`infouno_read_json`/`infouno_clamp`) y anti-spam de leads (honeypot + throttling). |
 | `metodo-uno/` | Landing del **Método UNO® — Diagnóstico Nivel 1** (wizard) + `public/diagnostico.php`: proxea al LLM (reusa `config.php`) y persiste el lead vía `db_lead.php` (`source=metodo-uno`). PHP, sin Node. Enlazada desde el nav/CTA del home. |
 | `metodo-dos/` | **Método DOS® — Diagnóstico Inteligente Nivel 2 (IOI®)**: wizard de 4 fases + `public/diagnostico2.php`. Motor de scoring **modular y puro** en `src/Scoring/` (`IOIEngine` + `ScoringConfig`), con tests en `tests/` (`php metodo-dos/tests/IOIEngineTest.php`). Calcula el IOI® (0–100) determinístico, costo de inacción y 3 puntos críticos; persiste el lead (`source=metodo-dos`) y pide el narrativo al LLM. Enlazada desde el CTA del home. |
+| `.htaccess` | Headers de seguridad, deny de includes/internos/`.bak`, `www`→apex, caché. Detalle en `ai/security-audit.md`. |
 | `config.php` | Credenciales MySQL + LLM (`api_base`/key) + emails. **No se versiona** (`.gitignore`); plantilla en `config.sample.php`. Guía de deploy en `ai/deploy-checklist.md`. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento inyectada en el system prompt de `chat.php`. |
 | `db/schema.sql` | DDL de `wp_infouno_leads`. |
@@ -50,6 +51,7 @@ No hay suite de tests automatizada: verificar el comportamiento real (bot, calcu
 ## Reglas y restricciones
 
 - **SEO y rendimiento primero:** scripts asíncronos/no bloqueantes; no penalizar LCP (< 2.5s) ni el rastreo de Google.
+- **Botones y enlaces:** todo botón, card o píldora que se cree o enlace lleva un efecto notorio y armónico con el diseño. Reusar los patrones de `assets/styles.css` (`.pillar--link`, `.remate a`: destello, glow, lift + flecha en hover, `:focus-visible`, `prefers-reduced-motion`).
 - **Seguridad:** nunca claves del LLM (OpenAI/Gemini) ni credenciales MySQL en el frontend; backend con prepared statements y sanitización; `escapeHtml` en el chat.
 - **IA:** `T = 0.3`, tono comercial directo (voseo argentino). El bot **no da precios** (G2) y solo asesora sobre Infouno (G1). Reglas completas en `ai/guardrails.md` y `ai/rules.md`.
 - **Trazabilidad:** todo lead relevante se persiste paso a paso en `wp_infouno_leads` (R4), con UTM.

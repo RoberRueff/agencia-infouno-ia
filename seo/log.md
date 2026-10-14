@@ -32,6 +32,15 @@ Registro de lo implementado y lo pendiente. Espejo operativo de la Fase 1.5/1.6 
 - Verificado en Chrome headless: banner aparece/recuerda decisión, Aceptar carga GA4, Rechazar no, y 4/5 eventos disparan (falta `tel:` para el quinto).
 - Base para el dashboard Looker: ver [dashboard-reporting.md](dashboard-reporting.md).
 
+## ✅ Consentimiento + rendimiento (2026-10-07)
+
+- **Consent Mode v2 antes de cualquier tag de Google** (inline en el `<head>` de las 10 páginas, incl. Método UNO/DOS). Google Ads (`AW-18453126520`, `INFOUNO.ads`) y GA4 se cargan solo tras aceptar el banner. Se quitó el `gtag.js` de AW incondicional.
+- **GTM (`GTM-WWBJW7F`) eliminado del home:** el contenedor publicado no tenía tags (verificado en `gtm.js`).
+- **Fuentes:** se quitó el `@import` de Google Fonts de `styles.css` → `preconnect` + `<link>` en el `<head>`; `site.js` con `defer`.
+- **`.htaccess`:** redirección `www` → apex (301), caché 1 día JS/CSS y 7 días PNG/SVG.
+- **`privacidad.html`:** secciones de cookies/medición y terceros.
+- Pendiente de verificar en prod: banner, Aceptar/Rechazar y que las conversiones de Ads sigan registrándose con consentimiento.
+
 ---
 
 ## ⏳ Pendiente

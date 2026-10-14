@@ -25,12 +25,14 @@ try {
     exit;
   }
 
-  $d = json_decode(file_get_contents('php://input'), true);
-  if (!is_array($d)) {
+  $d = infouno_read_json(40000);
+  if ($d === null) {
     http_response_code(400);
     echo json_encode(['error' => 'json']);
     exit;
   }
+
+  $d = infouno_clamp($d, 1500, 30);
 
   // Honeypot: bot → OK genérico sin guardar ni llamar al LLM.
   if (!empty($d['hp'])) {
@@ -49,11 +51,7 @@ try {
 
   // 1) IOI® determinístico (no depende del LLM).
   require_once __DIR__ . '/../src/Scoring/IOIEngine.php';
-  $result = IOIEngine::diagnose([
-    'phases'         => is_array($d['phases'] ?? null)         ? $d['phases']         : [],
-    'hours_per_week' => (float) ($d['hours_per_week'] ?? 0),
-    'critical_items' => is_array($d['critical_items'] ?? null) ? $d['critical_items'] : [],
-  ]);
+  $result = IOIEngine::diagnose(infouno_dos_clean($d));
 
   // 2) Persistir el lead ANTES del LLM (no se pierde aunque el LLM falle).
   require_once __DIR__ . '/../../db_lead.php';
@@ -101,6 +99,36 @@ try {
 
 /* ===================================================================== */
 
+/**
+ * Normaliza el input del motor IOI®: llega del navegador, así que se fuerza la forma
+ * esperada y se acotan los rangos (el wizard usa puntos 0–4 y horas 0–80). Evita IOI fuera
+ * de 0–100, costo de inacción inflado y excepciones que dejarían el lead sin guardar.
+ * ponytail: el puntaje sigue viniendo del cliente; para blindarlo del todo, mandar las
+ * respuestas (a2…d3) y calcular los puntos en el server.
+ */
+function infouno_dos_clean(array $d): array {
+  $num = static function ($v, float $lo, float $hi): float {
+    return max($lo, min($hi, is_numeric($v) ? (float) $v : 0.0));
+  };
+  $entry = static function ($r) use ($num): array {
+    $r = is_array($r) ? $r : [];
+    $max = $num($r['max'] ?? 0, 0, 10);
+    return ['points' => $num($r['points'] ?? 0, 0, $max), 'max' => $max];
+  };
+  $phases = [];
+  foreach (['A', 'B', 'C', 'D'] as $k) {
+    $rows = is_array($d['phases'][$k] ?? null) ? $d['phases'][$k] : [];
+    $phases[$k] = array_map($entry, array_slice(array_values($rows), 0, 10));
+  }
+  $items = [];
+  foreach (array_slice(array_values(is_array($d['critical_items'] ?? null) ? $d['critical_items'] : []), 0, 20) as $i) {
+    if (!is_array($i)) continue;
+    $e = $entry(['points' => $i['score'] ?? 0, 'max' => $i['max'] ?? 0]);
+    $items[] = ['label' => is_string($i['label'] ?? null) ? mb_substr($i['label'], 0, 120, 'UTF-8') : '', 'score' => $e['points'], 'max' => $e['max']];
+  }
+  return ['phases' => $phases, 'hours_per_week' => $num($d['hours_per_week'] ?? 0, 0, 168), 'critical_items' => $items];
+}
+
 /** Pide al LLM el narrativo del veredicto sobre los números ya calculados. */
 function infouno_dos_llm(array $cfg, array $result, array $d): ?string {
   if (empty($cfg['openai_key'])) return null;
@@ -135,6 +163,7 @@ function infouno_dos_llm(array $cfg, array $result, array $d): ?string {
     CURLOPT_POST           => true,
     CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Authorization: Bearer ' . $cfg['openai_key']],
     CURLOPT_POSTFIELDS     => $payload,
+    CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_TIMEOUT        => 30,
   ]);
   $raw  = curl_exec($ch);

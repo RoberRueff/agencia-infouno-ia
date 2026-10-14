@@ -39,7 +39,7 @@
 | `chat.php` | Proxy del bot "Uno" al LLM vía API compatible con OpenAI (OpenAI `gpt-4o-mini` / Gemini `gemini-2.5-flash` según `api_base`, T=0.3) con *function calling* (`guardar_lead`, `listo_para_agendar`) y fallback al guion. La API key vive solo aquí (vía `config.php`). |
 | `lead.php` | Receptor de leads (formulario + bot scripteado). Delega la persistencia en `db_lead.php`. |
 | `db_lead.php` | Persistencia compartida (`lead.php` + `chat.php` + los dos diagnósticos): sanitización, validación tel/email, mapeo a taxonomía, scoring/VIP (R3), upsert por `session_id` (R4) y email. **Fallback sin DB:** si MySQL no responde (o falla el `prepare`/`INSERT`), el lead **no se pierde**: sale por email con asunto `[LEAD SIN GUARDAR]`. Sin DB no se puede leer `lead_notified`, así que el candado anti-duplicado es un archivo por sesión fuera del webroot (`sys_get_temp_dir()`, igual que `ratelimit.php`). |
-| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`, `lead.php` y `diagnostico.php`; anti-spam de leads (honeypot + throttling). Ver `ai/security-audit.md` (H1/M2). |
+| `ratelimit.php` | Rate-limit anti-abuso (file-based, sin deps) para `chat.php`, `lead.php`, `diagnostico.php` y `diagnostico2.php`; incluye `infouno_read_json()` (tope de bytes) e `infouno_clamp()` (recorte de strings/ítems) para todo input que llega al LLM; anti-spam de leads (honeypot + throttling). Ver `ai/security-audit.md` (H1/M2). |
 | `metodo-uno/public/metodo-uno-nivel1.html` | Landing del **Método UNO® — Diagnóstico Nivel 1**: wizard de 4 pasos (JS inline). Postea a `diagnostico.php`. Enlazada desde el nav/CTA del home. El resultado se puede **descargar en PDF** (`window.print()` + `@media print`; sin librerías, texto seleccionable). |
 | `metodo-uno/public/diagnostico.php` | Endpoint del diagnóstico: valida + honeypot + rate-limit, **persiste el lead** (`db_lead.php`, `source=metodo-uno`) y proxea al LLM reusando `config.php`. PHP, sin Node. |
 | `metodo-dos/public/metodo-dos-nivel2.html` | Landing del **Método DOS® — Diagnóstico Inteligente Nivel 2 (IOI®)**: wizard de 4 fases (JS inline). Postea a `diagnostico2.php`. Enlazada desde el CTA del home. El resultado se puede **descargar en PDF** (`window.print()` + `@media print`; sin librerías, texto seleccionable). |
@@ -47,11 +47,12 @@
 | `metodo-dos/src/Scoring/IOIEngine.php` | Motor IOI® (lógica pura, testeable): normalización, fórmula ponderada, costo de inacción, veredicto, puntos críticos, `diagnose()`. |
 | `metodo-dos/src/Scoring/ScoringConfig.php` | Configuración tuneable del scoring: pesos de fases, valor/hora, semanas, rangos de veredicto. |
 | `metodo-dos/tests/IOIEngineTest.php` | Suite de tests del motor IOI® (PHP plano, `php metodo-dos/tests/IOIEngineTest.php`). |
+| `.htaccess` | Headers de seguridad (CSP Report-Only), deny de `config.php`/includes/`*.md|sql|bak*`/carpetas internas, `www`→apex, caché de JS/CSS/PNG. Ver `ai/security-audit.md`. |
 | `config.php` | Credenciales de MySQL, OpenAI y emails (completar en el server; **no se versiona**). |
 | `privacidad.html` | Política de privacidad (Ley 25.326). Enlazada desde el footer de todas las páginas. |
 | `config.sample.php` | Plantilla versionada de `config.php`, sin credenciales. |
 | `robots.txt` | Reglas de rastreo (bloquea backend/internos) + referencia al `sitemap.xml`. |
-| `sitemap.xml` | Mapa de las 9 URLs públicas (8 páginas + landing Método UNO) para Google Search Console. |
+| `sitemap.xml` | Mapa de las 10 URLs públicas (8 páginas + landings Método UNO y Método DOS) para Google Search Console. |
 | `ai-kb/kb_infouno.md` | Base de conocimiento del bot "Uno" (se inyecta en el system prompt de `chat.php`). |
 | `db/schema.sql` | DDL de la tabla `wp_infouno_leads` (pegar en phpMyAdmin). |
 | `assets/styles.css` | Estilos (temas dark/light, acentos, tipografías). |

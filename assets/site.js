@@ -15,6 +15,8 @@ window.INFOUNO = {
   // Vacío = no se carga GA4 (el banner de cookies queda inerte). Pegá el ID real cuando
   // crees la propiedad GA4. Sin consentimiento del usuario NO se carga ni se setean cookies.
   ga4: "G-54V1PR8K7V",
+  // ID de Google Ads (conversiones). Se carga SOLO tras el consentimiento, junto con GA4.
+  ads: "AW-18453126520",
 };
 
 function waLink(msg) {
@@ -443,20 +445,15 @@ function initBot() {
 (function () {
   var KEY = 'infouno_consent';                 // 'granted' | 'denied'
   var GA_ID = (window.INFOUNO && window.INFOUNO.ga4) || '';
+  var ADS_ID = (window.INFOUNO && window.INFOUNO.ads) || '';
 
   // dataLayer + gtag disponibles siempre (sin red): habilita Consent Mode v2.
   window.dataLayer = window.dataLayer || [];
   function gtag() { window.dataLayer.push(arguments); }
   window.gtag = gtag;
 
-  // Consent Mode v2: por defecto TODO denegado hasta una decisión explícita.
-  gtag('consent', 'default', {
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    analytics_storage: 'denied',
-    wait_for_update: 500
-  });
+  // Consent Mode v2: el "default: denied" se declara inline en el <head> de cada página,
+  // ANTES de cualquier tag de Google (acá llegaría tarde).
 
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function remember(v) { try { localStorage.setItem(KEY, v); } catch (e) { } }
@@ -471,6 +468,7 @@ function initBot() {
     document.head.appendChild(s);
     gtag('js', new Date());
     gtag('config', GA_ID, { anonymize_ip: true });
+    if (ADS_ID) gtag('config', ADS_ID);   // Google Ads: solo tras consentimiento
   }
 
   function grant() {
@@ -497,7 +495,7 @@ function initBot() {
     banner.className = 'consent'; banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Aviso de cookies');
     banner.innerHTML =
-      '<p class="consent__txt">Usamos cookies de medición (Google Analytics) para entender cómo se usa el sitio y mejorarlo. Son opcionales. Más info en nuestra <a href="privacidad.html">política de privacidad</a> (Ley 25.326).</p>'
+      '<p class="consent__txt">Usamos cookies de medición (Google Analytics) para entender cómo se usa el sitio y mejorarlo. Son opcionales. Más info en nuestra <a href="/privacidad.html">política de privacidad</a> (Ley 25.326).</p>'
       + '<div class="consent__row">'
       + '<button type="button" class="btn btn--ghost consent__btn" data-consent="denied">Rechazar</button>'
       + '<button type="button" class="btn btn--primary consent__btn" data-consent="granted">Aceptar</button>'

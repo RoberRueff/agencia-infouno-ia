@@ -10,8 +10,31 @@
 
 Options -Indexes
 
-# Bloquear acceso directo a config y archivos sensibles (defense-in-depth).
-# config.php es PHP (no filtra fuente), pero negamos el acceso por las dudas.
-<FilesMatch "^(config\.php|config\.sample\.php)$">
+# Bloquear acceso directo a config, includes de backend y archivos internos (defense-in-depth).
+# robots.txt NO protege nada: solo pide cortesía. Esto sí corta el acceso.
+# Los includes (db_lead.php, ratelimit.php) y ai-kb/ los leen los .php por filesystem, no por HTTP.
+<FilesMatch "^(config\.php|config\.sample\.php|db_lead\.php|ratelimit\.php)$">
   Require all denied
 </FilesMatch>
+<FilesMatch "\.(md|sql|bak[^/]*|log|ini|sh)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # www -> apex (una sola URL por página; evita contenido duplicado)
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+  # Directorios internos: nunca servidos por HTTP
+  RewriteRule ^(ai-kb|ai|db|docs|seo|sin-publicar|\.superpowers)(/|$) - [F,L]
+</IfModule>
+
+# Caché del navegador. site.js/styles.css no llevan hash en el nombre: 1 día para que un deploy
+# se propague rápido. Logo y fuentes cambian poco.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/javascript "access plus 1 day"
+  ExpiresByType application/javascript "access plus 1 day"
+  ExpiresByType text/css "access plus 1 day"
+  ExpiresByType image/png "access plus 7 days"
+  ExpiresByType image/svg+xml "access plus 7 days"
+</IfModule>

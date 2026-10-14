@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18453126520"></script>
+<!-- Consent Mode v2: debe ir ANTES de cualquier tag de Google. Todo denegado hasta que el usuario acepte (site.js). -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18453126520');
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied', wait_for_update:500});
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -96,6 +93,31 @@
     }
     .brand img { width: 28px; height: 28px; }
     .brand b { color: var(--acc-2); }
+
+    .top-nav { display: flex; gap: 8px; align-items: center; }
+    .top-nav a {
+      position: relative; overflow: hidden;
+      font-family: var(--ff-head); font-size: .78rem; font-weight: 600; white-space: nowrap;
+      color: var(--acc-2); text-decoration: none;
+      padding: 8px 14px; border-radius: 12px;
+      border: 1px solid var(--acc-line); background: var(--acc-soft);
+      transition: transform .25s, box-shadow .25s, border-color .25s, background .25s;
+    }
+    .top-nav a::before {
+      content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+      transition: transform .6s;
+    }
+    .top-nav a:hover { transform: translateY(-2px); border-color: var(--acc-2); box-shadow: 0 8px 20px -8px var(--glow); }
+    .top-nav a:hover::before { transform: translateX(120%); }
+    .top-nav a .arr { display: inline-block; margin-left: 4px; transition: transform .25s; }
+    .top-nav a:hover .arr { transform: translateX(3px); }
+    .top-nav a:focus-visible { outline: 2px solid var(--acc-2); outline-offset: 2px; }
+    @media (max-width: 700px) { .top-nav a { padding: 7px 10px; } }
+    @media (prefers-reduced-motion: reduce) {
+      .top-nav a, .top-nav a::before, .top-nav a .arr { transition: none; }
+      .top-nav a:hover { transform: none; }
+    }
 
     .prog-wrap {
       flex: 1;
@@ -537,6 +559,9 @@
     <div class="prog-wrap">
       <div class="prog-bar" id="pbar"></div>
     </div>
+    <nav class="top-nav" aria-label="Diagnósticos">
+      <a href="../../metodo-uno/public/metodo-uno-nivel1.html">Método UNO® · Diagnóstico Nivel 1<span class="arr" aria-hidden="true">→</span></a>
+    </nav>
     <div class="prog-label" id="plabel">Inicio</div>
   </div>
 </div>
@@ -1398,5 +1423,6 @@ function renderResult(json, data) {
   // Si narrativo es null simplemente no se muestra el card (display:none por defecto)
 }
 </script>
+<script src="../../assets/site.js" defer></script>
 </body>
 </html>

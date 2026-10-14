@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18453126520"></script>
+<!-- Consent Mode v2: debe ir ANTES de cualquier tag de Google. Todo denegado hasta que el usuario acepte (site.js). -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18453126520');
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied', wait_for_update:500});
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +24,9 @@
 <meta name="twitter:description" content="Escribinos por WhatsApp, email o agendá una reunión. Diagnóstico gratuito y sin compromiso.">
 <meta name="twitter:image" content="https://infouno.com.ar/assets/logo.png">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -35,8 +35,6 @@
   <div class="wrap nav__row">
     <a class="brand" href="index.html"><img src="assets/logo.png" alt="Infouno"><span>info<b>uno</b><span class="brand__ia">.ia</span></span></a>
     <nav class="nav__links">
-      <a href="servicios.html">Diseños con IA</a>
-      <a href="soluciones-ia.html">Automatización de Procesos</a>
       <a href="metodo-uno/public/metodo-uno-nivel1.html" style="color:var(--acc-2);display:inline-flex;align-items:center;gap:6px">
         <span style="width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px 1px var(--acc);flex-shrink:0"></span>
         Diagnóstico IA
@@ -164,6 +162,6 @@
   <span>Escribinos</span>
 </a>
 
-<script src="assets/site.js"></script>
+<script src="assets/site.js" defer></script>
 </body>
 </html>

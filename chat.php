@@ -30,10 +30,13 @@ if (!$rl['ok']) {
   exit;
 }
 
-$in = json_decode(file_get_contents('php://input'), true);
-if (!is_array($in)) { http_response_code(400); echo json_encode(['ok' => false, 'error' => 'json']); exit; }
+$in = infouno_read_json(20000);
+if ($in === null) { http_response_code(400); echo json_encode(['ok' => false, 'error' => 'json']); exit; }
 
-$session = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($in['session_id'] ?? ''));
+// Un chat legítimo tiene como mucho ~33 mensajes (16 turnos + respuestas): más es abuso.
+$msgCount = is_array($in['messages'] ?? null) ? count($in['messages']) : 0;
+$in = infouno_clamp($in, 1500, 40);
+$session = substr(preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($in['session_id'] ?? '')), 0, 64);
 $page    = is_string($in['page'] ?? null) ? $in['page'] : '';
 $msgsIn  = is_array($in['messages'] ?? null) ? $in['messages'] : [];
 
@@ -41,6 +44,7 @@ $msgsIn  = is_array($in['messages'] ?? null) ? $in['messages'] : [];
 $history = [];
 $turns = 0;
 foreach ($msgsIn as $m) {
+  if (!is_array($m) || !is_string($m['content'] ?? null)) continue;
   $role = (($m['role'] ?? '') === 'assistant') ? 'assistant' : 'user';
   $content = trim((string) ($m['content'] ?? ''));
   if ($content === '') continue;
@@ -50,7 +54,7 @@ foreach ($msgsIn as $m) {
 }
 
 // Tope de turnos (control de costo)
-if ($turns > 16) {
+if ($turns > 16 || $msgCount > 40) {
   echo json_encode(['ok' => true, 'reply' => 'Para no hacerte perder tiempo, lo mejor es seguirlo con una persona del equipo. Coordinemos la consultoría 👇', 'readyToClose' => true, 'leadFields' => new stdClass()]);
   exit;
 }
@@ -171,6 +175,7 @@ function infouno_openai($cfg, $messages, $tools) {
     CURLOPT_POST           => true,
     CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Authorization: Bearer ' . $cfg['openai_key']],
     CURLOPT_POSTFIELDS     => $payload,
+    CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_TIMEOUT        => 30,
   ]);
   $raw  = curl_exec($ch);

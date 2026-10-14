@@ -29,12 +29,15 @@ if (!$rl['ok']) {
   exit;
 }
 
-$d = json_decode(file_get_contents('php://input'), true);
-if (!is_array($d)) {
+$d = infouno_read_json(40000);
+if ($d === null) {
   http_response_code(400);
   echo json_encode(['error' => 'json']);
   exit;
 }
+
+// Tope de largo por campo / ítems: todo esto termina en el prompt del LLM (cobra por token).
+$d = infouno_clamp($d, 1500, 30);
 
 // Honeypot: si viene relleno, es un bot. Respondemos OK genérico sin guardar ni llamar al LLM.
 if (!empty($d['hp'])) {
@@ -182,6 +185,7 @@ function infouno_diag_llm($cfg, $system, $user) {
     CURLOPT_POST           => true,
     CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Authorization: Bearer ' . $cfg['openai_key']],
     CURLOPT_POSTFIELDS     => $payload,
+    CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_TIMEOUT        => 30,
   ]);
   $raw  = curl_exec($ch);

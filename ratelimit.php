@@ -81,3 +81,30 @@ function infouno_rate_check($cfg, $opts = []) {
 
   return ['ok' => true, 'reason' => ''];
 }
+
+/**
+ * Lee el body JSON con tope de bytes (anti-abuso: el body va al LLM, que cobra por token).
+ * Si excede el tope responde 413 y corta. Devuelve el array o null si no es JSON válido.
+ */
+function infouno_read_json($maxBytes = 20000) {
+  $raw = file_get_contents('php://input', false, null, 0, $maxBytes + 1);
+  if ($raw !== false && strlen($raw) > $maxBytes) {
+    http_response_code(413);
+    echo json_encode(['ok' => false, 'error' => 'too_large']);
+    exit;
+  }
+  $d = json_decode((string) $raw, true);
+  return is_array($d) ? $d : null;
+}
+
+/** Recorta strings (largo), arrays (cantidad de ítems) y profundidad de un input no confiable. */
+function infouno_clamp($v, $maxStr = 2000, $maxItems = 40, $depth = 4) {
+  if (is_string($v)) return mb_strlen($v) > $maxStr ? mb_substr($v, 0, $maxStr, 'UTF-8') : $v;
+  if (is_array($v)) {
+    if ($depth <= 0) return [];
+    $out = [];
+    foreach (array_slice($v, 0, $maxItems, true) as $k => $x) $out[$k] = infouno_clamp($x, $maxStr, $maxItems, $depth - 1);
+    return $out;
+  }
+  return is_scalar($v) ? $v : null;
+}

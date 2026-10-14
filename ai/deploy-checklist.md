@@ -12,7 +12,8 @@ DonWeb. Nace de los errores reales del primer deploy: todos eran **silenciosos**
 ## 0. Qué se sube y qué NO
 
 - **Se sube** (FTP/File Manager): los `.html`, `assets/`, `chat.php`, `lead.php`,
-  `db_lead.php`, `robots.txt`, `sitemap.xml`, `ai-kb/`.
+  `db_lead.php`, `ratelimit.php`, `.htaccess`, `robots.txt`, `sitemap.xml`, `ai-kb/`.
+  Tras subir, verificar: `ai-kb/kb_infouno.md`, `db_lead.php` y `README.md` dan **403**; `www.` redirige 301 al apex; el chat responde; el banner de cookies aparece y "Rechazar" no carga tags de Google.
 - **NO se sube desde el repo** (está en `.gitignore`): **`config.php`** → se crea a mano en el
   server (Paso 4). Es la causa #1 de backend caído tras un deploy.
 - **No hace falta en producción:** `ai/`, `seo/`, `db/`, `sin-publicar/` (son docs/fuente).

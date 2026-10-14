@@ -74,8 +74,8 @@ No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
 
 - **L1 — `session_id` controlado por el cliente:** upsert por session_id provisto por el cliente
   → posible sobrescritura/contaminación. Bajo (IDs random); se mitiga con rate-limit (H1/M2). `PENDIENTE`
-- **L2 — Server banner:** se expone `openresty/1.27.1.1`. Suprimir `server_tokens`. `PENDIENTE`
-- **L3 — HTTPS forzado:** confirmar `http://` → 301 `https` + HSTS (no verificable por el WAF). `PENDIENTE`
+- **L2 — Server banner:** ya no se expone la versión (hoy responde `Server: Apache`, verificado 2026-10-07). `RESUELTO`
+- **L3 — HTTPS forzado:** `http://` → 301 `https` y HSTS presentes (verificado en prod 2026-10-07). `RESUELTO`
 - **L4 — Email spoofing/deliverability:** configurar **SPF + DKIM + DMARC** del dominio (clave
   también para la auto-respuesta al lead de la Fase E). `PENDIENTE`
 - **L5 — Prompt injection del bot:** guardrails G1/G2 en el system prompt; blast radius acotado
@@ -95,7 +95,30 @@ No había HSTS/CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy.
 | 3 | H1 — rate-limit en `chat.php` | ✅ hecho + **verificado en prod (429 OK)**. Falta: tope de gasto del proveedor (operativo) |
 | 4 | M2 — honeypot + rate-limit en `lead.php` | ✅ hecho (código); Turnstile opcional |
 | 5 | L4 — SPF/DKIM/DMARC del dominio | ⏳ pendiente (DNS) |
-| 6 | L2/L3 — server_tokens off + forzar HTTPS/HSTS | ⏳ pendiente |
+| 6 | L2/L3 — server_tokens off + forzar HTTPS/HSTS | ✅ verificado en prod (2026-10-07) |
+| 7 | Consent Mode v2 antes de los tags de Google + política de privacidad (cookies/terceros) | ✅ hecho en código; **verificar banner en navegador tras deploy** |
+| 8 | Topes de entrada (`infouno_read_json`/`infouno_clamp`) en chat, lead y diagnósticos + `infouno_dos_clean` (IOI®) + `CONNECTTIMEOUT` | ✅ hecho y probado en local |
+| 9 | `.htaccess`: deny de includes/internos/`.bak`, `www`→apex, caché | ✅ probado contra Apache local; **verificar en prod tras deploy** |
+| 10 | Webhook WhatsApp (cartera): rechazar `app_secret`/`verify_token` vacío o placeholder | ⏳ pendiente |
+| 11 | CSP en enforce (hoy Report-Only sin `report-uri`; requiere sacar scripts inline) | ⏳ pendiente |
+| 12 | Cartera: cookie `path` propio / subdominio, límite por IP en login de clientes, `noindex` en admin | ⏳ pendiente |
+| 13 | IOI®: calcular puntos en el server a partir de las respuestas | ⏳ pendiente (hoy acotado, no blindado) |
+| 14 | Tope global diario agotable por rotación de IP (chat 1.500 / lead 5.000) → Turnstile o Cloudflare | ⏳ pendiente |
 
 > **Nota de deploy:** `.htaccess` va a `public_html`. `db_lead.php` (fix M1) hay que **subirlo**
 > a DonWeb para que tome efecto. Verificar headers con `curl -I` post-deploy.
+
+---
+
+## Actualización 2026-10-07 — Consent Mode y carga de fuentes
+
+- **Consent Mode v2:** el `gtag('consent','default',{...denied})` va inline en el `<head>` de TODAS las páginas (incluidos Método UNO/DOS), antes de cualquier tag de Google. Google Ads (`INFOUNO.ads`) y GA4 se cargan solo tras aceptar el banner (`site.js`). Se quitó el `gtag.js` de AW incondicional. GTM (GTM-WWBJW7F) se eliminó del home: el contenedor publicado no tenía ningún tag (verificado en gtm.js).
+- **Privacidad:** `privacidad.html` suma secciones de cookies/medición y terceros (proveedor de IA, Google, Cal.com).
+- **Rendimiento:** se quitó el `@import` de Google Fonts de `styles.css` (cadena bloqueante) → `preconnect` + `<link>` en el `<head>`; `site.js` con `defer`.
+
+## Actualización 2026-10-07 (2) — Topes de entrada y .htaccess
+
+- **Topes de entrada (anti-abuso económico del LLM):** `ratelimit.php` suma `infouno_read_json()` (tope de bytes → 413) e `infouno_clamp()` (largo de strings, cantidad de ítems, profundidad). Los usan `chat.php` y `lead.php` (20 KB), `metodo-uno/diagnostico.php` y `metodo-dos/diagnostico2.php` (40 KB). `chat.php` además corta con >40 mensajes de historial, descarta ítems mal formados y limita `session_id` a 64 chars.
+- **Método DOS®:** `infouno_dos_clean()` fuerza la forma y los rangos del input del motor IOI® (puntos 0–`max`, `max` ≤ 10, horas 0–168). El IOI® ya no puede salir de 0–100 ni lanzar excepciones antes de guardar el lead. Limitación conocida: el puntaje sigue calculándose con valores del cliente (ver nota `ponytail:` en el código).
+- **Timeouts:** `CURLOPT_CONNECTTIMEOUT` en las llamadas al LLM (5 s) y al webhook de Make (2 s).
+- **.htaccess:** deniega `db_lead.php`, `ratelimit.php`, `*.md|sql|bak*|log|ini|sh` y los directorios `ai-kb/ ai/ db/ docs/ seo/ sin-publicar/` (robots.txt no protege nada); redirige `www` → apex (301); caché de 1 día para JS/CSS y 7 días para PNG/SVG. Probado contra Apache local.

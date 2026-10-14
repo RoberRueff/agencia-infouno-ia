@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 <html lang="es-AR">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-WWBJW7F');</script>
-<!-- End Google Tag Manager -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18453126520"></script>
+<!-- Consent Mode v2: debe ir ANTES de cualquier tag de Google. Todo denegado hasta que el usuario acepte (site.js). -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18453126520');
+  gtag('consent', 'default', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied', wait_for_update:500});
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,6 +24,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="twitter:description" content="Creamos webs dinámicas y automatizamos tareas repetitivas para que tu PyME reduzca costos y multiplique ventas en Argentina.">
 <meta name="twitter:image" content="https://infouno.com.ar/assets/logo.png">
 <link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 <script type="application/ld+json">
 {
@@ -68,27 +61,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WWBJW7F"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-
 <!-- ===== HEADER ===== -->
 <header class="nav" data-screen-label="Inicio">
   <div class="wrap nav__row">
     <a class="brand" href="index.html"><img src="assets/logo.png" alt="Infouno"><span>info<b>uno</b><span class="brand__ia">.ia</span></span></a>
-    <nav class="nav__links">
-      <a href="servicios.html">Diseños con IA</a>
-      <a href="soluciones-ia.html">Automatización de Procesos</a>
-      <a href="metodo-uno/public/metodo-uno-nivel1.html" style="color:var(--acc-2);display:inline-flex;align-items:center;gap:6px">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px 1px var(--acc);flex-shrink:0"></span>
-        Diagnóstico IA
-      </a>
-      <a href="metodo-dos/public/metodo-dos-nivel2.html" style="color:var(--acc-2);background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:12px;padding:9px 16px;display:inline-flex;align-items:center;gap:6px">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px 1px var(--acc);flex-shrink:0"></span>
-        Diagnóstico IOI®
-      </a>
-    </nav>
     <div class="nav__cta">
       <a class="btn btn--ghost" href="#" data-open-bot aria-label="Bot uno · en línea" title="Bot uno" style="position:relative;overflow:visible;background:var(--grad);color:#fff;border-color:transparent;padding:13px 18px;box-shadow:0 6px 16px -6px var(--glow)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 8V5M9 3h6"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg><span aria-hidden="true" style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--green);border:2.5px solid var(--bg);box-shadow:0 0 8px 0 var(--green)"></span></a>
       <a class="btn btn--wa" data-wa="Hola Infouno 👋 Quiero un presupuesto para mi negocio.">
@@ -96,7 +72,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         WhatsApp
       </a>
     </div>
-    <button class="nav__toggle" aria-label="Menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
   </div>
 </header>
 
@@ -109,7 +84,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="wrap hero__inner">
     <div>
-      <span class="eyebrow">WordPress + Inteligencia Artificial</span>
+      <a class="eyebrow eyebrow--link" href="metodo-dos/public/metodo-dos-nivel2.html">Diagnóstico + Inteligencia Artificial<span class="eyebrow__arr" aria-hidden="true">→</span></a>
       <h1 class="h-display"><span class="ink-grad">Hacé crecer tu negocio en Argentina</span><br><span class="grad-text">mientras la IA trabaja por vos.</span></h1>
       <p class="lead">Combinamos la estabilidad de <b style="color:var(--ink)">WordPress</b> con el poder de la <b style="color:var(--ink)">Inteligencia Artificial</b>. Creamos sitios dinámicos y automatizamos tus tareas repetitivas para que tu PyME reduzca costos y multiplique sus ventas en Argentina.</p>
       <div class="hero__cta">
@@ -123,10 +98,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </a>
       </div>
       <div class="tagrow">
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>WordPress + MySQL</span>
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Agentes IA 24/7</span>
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Automatización</span>
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>SEO</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Tu web se actualiza sola</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Respondemos tus WhatsApps de noche</span>
       </div>
     </div>
 
@@ -172,7 +145,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>Perdés clientes de madrugada porque no hay nadie para atenderlos.</p>
       </article>
     </div>
-    <div class="remate reveal"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Nosotros lo <b>automatizamos.</b></span></div>
+    <div class="remate reveal"><a href="#calculadora" aria-label="Nosotros lo automatizamos: calculá tu ahorro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Nosotros lo <b>automatizamos.</b></a></div>
   </div>
 </section>
 
@@ -236,30 +209,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="lead">Tres pilares que combinan tecnología sólida con inteligencia artificial real.</p>
     </div>
     <div class="grid g-3">
-      <div class="card pillar star reveal">
+      <a href="servicios.html" class="card pillar star pillar--link reveal" aria-label="Desarrollo Web con IA: ver servicios">
         <span class="pillar__tag">★ Producto estrella</span>
         <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3"/><path d="M16 9l4 3-4 3"/><path d="M14 5l-4 14"/></svg></div>
         <h3>Desarrollo Web con IA</h3>
         <p>Sitios institucionales y e-commerce ultra veloces, autoadministrables y robustos sobre WordPress + MySQL.</p>
         <div class="ptit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 3.6L17 8l-3.4 1.4L12 13l-1.6-3.6L7 8z"/></svg>El toque IA</div>
         <p style="margin-top:8px">Catálogos que se actualizan solos, sugerencias automáticas de productos según el comportamiento del cliente y SEO interno optimizado.</p>
-      </div>
-      <div class="card pillar reveal">
+      <span class="pillar__go">Ver servicios <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="soluciones-ia.html" class="card pillar pillar--link reveal" aria-label="Automatización de Procesos: ver soluciones IA">
         <span class="pillar__tag">Upsell clave</span>
         <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/><circle cx="12" cy="12" r="4"/></svg></div>
         <h3>Automatización de Procesos</h3>
         <p>Agentes IA integrados a WhatsApp y WordPress que responden consultas complejas, muestran catálogo y cierran ventas de madrugada.</p>
         <div class="ptit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 3.6L17 8l-3.4 1.4L12 13l-1.6-3.6L7 8z"/></svg>El toque IA</div>
         <p style="margin-top:8px">Sincronización inteligente de la web con stock, facturación y bases MySQL, eliminando la carga manual de datos.</p>
-      </div>
-      <div class="card pillar reveal">
+        <span class="pillar__go">Ver soluciones <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#agendar" class="card pillar pillar--link reveal" aria-label="SEO Potenciado con IA: agendá tu reunión gratuita">
         <span class="pillar__tag">Posicionamiento</span>
         <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
         <h3>SEO Potenciado con IA</h3>
         <p>Optimización de palabras clave y estructura web pensada para que Google te encuentre primero.</p>
         <div class="ptit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 3.6L17 8l-3.4 1.4L12 13l-1.6-3.6L7 8z"/></svg>El toque IA</div>
         <p style="margin-top:8px">Creación de contenido masivo optimizado con IA y análisis de competencia automatizado para ganarle posiciones a Google.</p>
-      </div>
+        <span class="pillar__go">Agendá tu reunión <span aria-hidden="true">→</span></span>
+      </a>
     </div>
   </div>
 </section>
@@ -273,9 +249,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="lead">Llevamos años desarrollando sobre WordPress y MySQL. No somos improvisados experimentando con herramientas de moda: integramos Inteligencia Artificial real sobre bases tecnológicas sólidas y seguras para tu empresa.</p>
     </div>
     <div class="trust-metrics reveal">
-      <div class="tm"><b>+10</b><span>años en el mercado</span></div>
-      <div class="tm"><b>+150</b><span>proyectos entregados</span></div>
-      <div class="tm"><b>+40</b><span>PyMEs automatizadas</span></div>
+      <div class="tm"><b>+15</b><span>años en el mercado</span></div>
+      <div class="tm"><b>+67</b><span>proyectos entregados</span></div>
+      <div class="tm"><b>+5</b><span>PyMEs automatizadas</span></div>
     </div>
   </div>
 </section>
@@ -355,7 +331,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- ===== 7 · CTA FINAL ===== -->
-<section class="section">
+<section class="section" id="agendar">
   <div class="wrap">
     <div class="cta-band reveal">
       <div class="deco"></div>
@@ -444,7 +420,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="bot__foot" id="bot-foot"></div>
 </div>
 
-<script src="assets/site.js"></script>
+<script src="assets/site.js" defer></script>
 
 <template id="__bundler_thumbnail" data-bg-color="#080B11">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">

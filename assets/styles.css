@@ -3,7 +3,6 @@
    Midnight + azul acero · Space Grotesk / Manrope
    =========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root{
   /* Fondos */
@@ -81,6 +80,15 @@ p{margin:0}
   background:rgba(62,155,230,.06);backdrop-filter:blur(6px);
 }
 .eyebrow::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--acc);box-shadow:0 0 10px 1px var(--acc)}
+.eyebrow--link{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .22s ease,background .2s ease,border-color .2s ease}
+.eyebrow--link::after{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transition:transform .6s;pointer-events:none}
+.eyebrow--link:hover,.eyebrow--link:focus-visible{transform:translateY(-2px);color:#fff;border-color:transparent;background:var(--grad);box-shadow:0 16px 40px -10px var(--glow),inset 0 1px 0 rgba(255,255,255,.25)}
+.eyebrow--link:hover::before{background:#fff;box-shadow:0 0 10px 1px #fff}
+.eyebrow--link:hover::after{transform:translateX(120%)}
+.eyebrow__arr{display:inline-block;transition:transform .25s}
+.eyebrow--link:hover .eyebrow__arr{transform:translateX(4px)}
+.eyebrow--link:focus-visible{outline:2px solid var(--acc-2);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.eyebrow--link,.eyebrow--link::after,.eyebrow__arr{transition:none}.eyebrow--link:hover,.eyebrow--link:focus-visible{transform:none}}
 .eyebrow--green::before{background:var(--green);box-shadow:0 0 10px 1px var(--green)}
 
 .h-display{font-size:clamp(2.6rem,6.4vw,5rem);letter-spacing:-.04em;font-weight:600;line-height:1.0}
@@ -125,6 +133,16 @@ p{margin:0}
 .nav__links a:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav__links a.active{color:#fff;background:rgba(255,255,255,.06)}
 .nav__cta{display:flex;align-items:center;gap:10px}
+.nav__ioi{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:7px;font-family:var(--ff-head);font-weight:600;font-size:.9rem;color:var(--acc-2);background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:12px;padding:11px 16px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.nav__ioi::before{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transition:transform .6s}
+.nav__ioi:hover{transform:translateY(-2px);border-color:var(--acc-2);box-shadow:0 8px 20px -8px var(--glow)}
+.nav__ioi:hover::before{transform:translateX(120%)}
+.nav__ioi-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px 1px var(--acc);flex-shrink:0}
+.nav__ioi-arr{display:inline-block;transition:transform .25s}
+.nav__ioi:hover .nav__ioi-arr{transform:translateX(3px)}
+.nav__ioi:focus-visible{outline:2px solid var(--acc-2);outline-offset:2px}
+@media (max-width:940px){.nav__ioi{display:none}}
+@media (prefers-reduced-motion:reduce){.nav__ioi,.nav__ioi::before,.nav__ioi-arr{transition:none}.nav__ioi:hover{transform:none}}
 .nav__toggle{display:none;background:none;border:0;cursor:pointer;padding:8px;color:#fff}
 .nav__toggle svg{width:26px;height:26px}
 
@@ -354,8 +372,16 @@ p{margin:0}
 
 /* remate de dolores */
 .remate{margin-top:44px;display:flex;justify-content:center}
-.remate span{display:inline-flex;align-items:center;gap:12px;padding:15px 28px;border-radius:999px;border:1px solid var(--acc-line);background:var(--acc-soft);backdrop-filter:blur(6px);font-family:var(--ff-head);font-weight:600;font-size:clamp(1.1rem,2vw,1.45rem);color:var(--ink)}
-.remate span svg{width:22px;height:22px;color:var(--acc-2)}
+.remate span,.remate a{display:inline-flex;align-items:center;gap:12px;padding:15px 28px;border-radius:999px;border:1px solid var(--acc-line);background:var(--acc-soft);backdrop-filter:blur(6px);font-family:var(--ff-head);font-weight:600;font-size:clamp(1.1rem,2vw,1.45rem);color:var(--ink)}
+.remate span svg,.remate a svg{width:22px;height:22px;color:var(--acc-2)}
+.remate a{position:relative;overflow:hidden;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease,background .35s ease;animation:remPulse 2.8s ease-in-out infinite}
+.remate a::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(110deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);animation:starShine 3.6s ease-in-out infinite;pointer-events:none}
+.remate a svg{transition:transform .3s ease}
+.remate a:hover{transform:translateY(-4px) scale(1.04);border-color:var(--acc-2);background:rgba(62,155,230,.24);box-shadow:0 18px 44px -12px var(--glow),0 0 0 1px var(--acc-2);animation:none}
+.remate a:hover svg{transform:translateX(6px)}
+.remate a:focus-visible{outline:2px solid var(--acc-2);outline-offset:4px}
+@keyframes remPulse{0%,100%{box-shadow:0 0 0 0 rgba(62,155,230,0)}50%{box-shadow:0 0 28px -4px var(--glow)}}
+@media (prefers-reduced-motion:reduce){.remate a,.remate a::after{animation:none}.remate a:hover{transform:none}}
 .remate b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 
 /* ---------- Tarjetas de dolor (rediseño) ---------- */
@@ -397,6 +423,17 @@ input[type=range].rng::-moz-range-thumb{width:22px;height:22px;border-radius:50%
 .pillar.star{border-color:var(--acc-line);background:radial-gradient(130% 120% at 50% 0%,rgba(62,155,230,.12),transparent 55%),linear-gradient(180deg,var(--panel-2),var(--panel))}
 .pillar__tag{position:absolute;top:20px;right:20px;font-family:var(--ff-head);font-weight:500;font-size:.72rem;letter-spacing:.04em;padding:5px 11px;border-radius:999px;border:1px solid var(--acc-line);color:var(--acc-2);background:var(--acc-soft)}
 .pillar.star .pillar__tag{color:#fff;background:var(--grad);border-color:transparent;box-shadow:0 6px 16px -6px var(--glow)}
+.pillar--link{display:block;color:inherit;cursor:pointer;overflow:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease}
+.pillar--link::after{content:"";position:absolute;top:0;left:-80%;width:45%;height:100%;background:linear-gradient(110deg,transparent,rgba(255,255,255,.10),transparent);transform:skewX(-20deg);animation:starShine 4.5s ease-in-out infinite;pointer-events:none}
+.pillar--link:hover{transform:translateY(-8px) scale(1.015);border-color:var(--acc-2);box-shadow:0 28px 60px -18px var(--glow),0 0 0 1px var(--acc-2),0 0 36px -6px var(--glow)}
+.pillar--link:hover .card__ico{background:var(--grad);color:#fff;transform:rotate(-6deg) scale(1.08)}
+.pillar--link .card__ico{transition:transform .35s ease,background .35s ease,color .35s ease}
+.pillar__go{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-family:var(--ff-head);font-weight:600;font-size:.92rem;color:var(--acc-2)}
+.pillar__go span{display:inline-block;transition:transform .3s ease}
+.pillar--link:hover .pillar__go span{transform:translateX(7px)}
+.pillar--link:focus-visible{outline:2px solid var(--acc-2);outline-offset:4px}
+@keyframes starShine{0%,60%{left:-80%}100%{left:140%}}
+@media (prefers-reduced-motion:reduce){.pillar--link::after{animation:none}.pillar--link:hover{transform:none}}
 .pillar h3{font-size:1.32rem;margin:18px 0 10px}
 .pillar .ptit{display:flex;align-items:center;gap:7px;font-family:var(--ff-head);font-weight:600;font-size:.84rem;color:var(--acc-2);text-transform:uppercase;letter-spacing:.05em;margin-top:18px}
 .pillar .ptit svg{width:16px;height:16px}
