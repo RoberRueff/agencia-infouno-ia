@@ -15,8 +15,10 @@ window.INFOUNO = {
   // Vacío = no se carga GA4 (el banner de cookies queda inerte). Pegá el ID real cuando
   // crees la propiedad GA4. Sin consentimiento del usuario NO se carga ni se setean cookies.
   ga4: "G-54V1PR8K7V",
-  // ID de Google Ads (conversiones). Se carga SOLO tras el consentimiento, junto con GA4.
-  ads: "AW-18453126520",
+  // ID de Google Ads: vacío a propósito (evita un segundo gtag("config") duplicado).
+  ads: "", // el tag de Ads (gtag.js + config) ya va inline en el <head> de cada página
+  // Etiqueta de la conversión de Ads por clic en WhatsApp (AW-ID/ETIQUETA). Vacío = no dispara.
+  adsWhatsapp: "AW-18453126520/g89cCN2A7p0dEPi6kd9E",
 };
 
 function waLink(msg) {
@@ -95,7 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = e.target.closest ? e.target.closest('a[href]') : null;
     if (!a) return;
     const href = a.getAttribute('href') || '';
-    if (/wa\.me|api\.whatsapp/.test(href)) window.infoTrack('click_whatsapp', { link_url: href });
+    if (/wa\.me|api\.whatsapp/.test(href)) {
+      window.infoTrack('click_whatsapp', { link_url: href });
+      if (window.INFOUNO.adsWhatsapp) window.infoTrack('conversion', { send_to: window.INFOUNO.adsWhatsapp });
+    }
     else if (href.indexOf('tel:') === 0) window.infoTrack('click_phone', { link_url: href });
   }, true);
 
