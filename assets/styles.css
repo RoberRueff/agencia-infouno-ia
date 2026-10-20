@@ -80,10 +80,9 @@ p{margin:0}
   background:rgba(62,155,230,.06);backdrop-filter:blur(6px);
 }
 .eyebrow::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--acc);box-shadow:0 0 10px 1px var(--acc)}
-.eyebrow--link{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .22s ease,background .2s ease,border-color .2s ease}
-.eyebrow--link::after{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transition:transform .6s;pointer-events:none}
-.eyebrow--link:hover,.eyebrow--link:focus-visible{transform:translateY(-2px);color:#fff;border-color:transparent;background:var(--grad);box-shadow:0 16px 40px -10px var(--glow),inset 0 1px 0 rgba(255,255,255,.25)}
-.eyebrow--link:hover::before{background:#fff;box-shadow:0 0 10px 1px #fff}
+.eyebrow--link{position:relative;overflow:hidden;transition:transform .3s ease,box-shadow .35s ease,background .3s ease,border-color .3s ease,color .3s ease}
+.eyebrow--link::after{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);transition:transform .9s ease;pointer-events:none}
+.eyebrow--link:hover,.eyebrow--link:focus-visible{transform:translateY(-1px);color:#fff;border-color:var(--acc);background:rgba(62,155,230,.14);box-shadow:0 8px 24px -12px var(--glow)}
 .eyebrow--link:hover::after{transform:translateX(120%)}
 .eyebrow__arr{display:inline-block;transition:transform .25s}
 .eyebrow--link:hover .eyebrow__arr{transform:translateX(4px)}

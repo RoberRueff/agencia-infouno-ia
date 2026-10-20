@@ -52,6 +52,7 @@ No hay suite de tests automatizada: verificar el comportamiento real (bot, calcu
 
 - **SEO y rendimiento primero:** scripts asíncronos/no bloqueantes; no penalizar LCP (< 2.5s) ni el rastreo de Google.
 - **Botones y enlaces:** todo botón, card o píldora que se cree o enlace lleva un efecto notorio y armónico con el diseño. Reusar los patrones de `assets/styles.css` (`.pillar--link`, `.remate a`: destello, glow, lift + flecha en hover, `:focus-visible`, `prefers-reduced-motion`).
+- **Estilo del efecto (siempre suave):** el hover de todo botón/enlace debe ser sutil y armónico, como `.eyebrow--link` (píldora sobre el hero): tinte azul de fondo (`rgba(62,155,230,.14)`), borde `var(--acc)`, glow tenue, elevación de máx. 1px, destello leve (≈.08 de opacidad, ~.9s) y flecha que se desplaza. Evitar rellenos de gradiente completos, glows fuertes o saltos bruscos en elementos secundarios.
 - **Seguridad:** nunca claves del LLM (OpenAI/Gemini) ni credenciales MySQL en el frontend; backend con prepared statements y sanitización; `escapeHtml` en el chat.
 - **IA:** `T = 0.3`, tono comercial directo (voseo argentino). El bot **no da precios** (G2) y solo asesora sobre Infouno (G1). Reglas completas en `ai/guardrails.md` y `ai/rules.md`.
 - **Trazabilidad:** todo lead relevante se persiste paso a paso en `wp_infouno_leads` (R4), con UTM.
